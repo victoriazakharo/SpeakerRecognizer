@@ -38,6 +38,4 @@ if [ -f $model_folder ] ; then
    rm "${model_folder}/*"
 fi
 
-#$cmd JOB=1:$nj "${logdir}/speaker_modeler.JOB.log" "$program" "${model_folder}/" model.JOB.txt "${alignment}/result_ali.JOB" "${record_folder}/" "$record_location";
-
-$cmd JOB=1:$nj "${logdir}/speaker_modeler.JOB.log" "$program" "${model_folder}/" model.JOB.txt "${alignment}/all_result_alignment.txt" "${record_folder}/" "$record_location";
+$cmd JOB=1:$nj "${logdir}/speaker_modeler.JOB.log" "$program" "${model_folder}/" model.JOB.txt "${alignment}/result_ali.JOB" "${record_folder}/" "$record_location";
