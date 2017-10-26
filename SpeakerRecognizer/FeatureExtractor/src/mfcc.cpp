@@ -36,7 +36,7 @@ void Mfcc::InitFilterBanks() {
 		melSpacing.push_back(mel);
 	}	
 	
-	double interval = sampleFreq / (NFFT - 1);
+	double interval = sampleFreq / NFFT;
 
 	int bins_num = NFFT / 2;
 	// Init fftFreqs2Mel
