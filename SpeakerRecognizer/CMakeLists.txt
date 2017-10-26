@@ -4,7 +4,7 @@ set(RECOGNIZER_APP SpeakerRecognizer)
 set(MODELER_APP SpeakerModeler)
 set(FEATURE_LIB FeatureExtractor)
 set(TEST_APP Test)
-set(BINARY_DIR ${CMAKE_BINARY_DIR}/bin2)
+set(BINARY_DIR ${CMAKE_BINARY_DIR}/bin)
 project(${NAME})
 
 if(WIN32)
