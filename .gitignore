@@ -14,6 +14,5 @@ cpp/SpeakerRecognizer/cmake_install.cmake
 java/SpeakerRecognizer/.gradle/
 java/SpeakerRecognizer/.idea/
 java/SpeakerRecognizer/build/
-*.iml
 java/SpeakerRecognizer/out/
-
+*.iml
