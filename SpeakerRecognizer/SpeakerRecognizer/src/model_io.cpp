@@ -1,6 +1,6 @@
 #include "model_io.h"
 
-void ReadModel(const std::string& folder, const std::string& file_name, std::map<int, std::vector<arma::gmm_diag>>& data) {
+void ReadModel(const std::string& folder, const std::string& file_name, std::map<int, std::vector<arma::gmm_diag>>& data) {	
 	std::vector<int> model_sizes;
 	std::vector<int> dictors;
 	std::ifstream in(file_name, std::ios::binary);
@@ -19,6 +19,8 @@ void ReadModel(const std::string& folder, const std::string& file_name, std::map
 			model.load(folder + std::to_string(dictors[i]) + "." + std::to_string(j));
 			data[dictors[i]].push_back(model);
 		}
+		printf("\r%d of %d", i, dictors_num);
 	}
+	printf("Finished reading models\n");
 	in.close();
 };

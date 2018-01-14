@@ -1,4 +1,4 @@
 FeatureExtractor/include/export.h
 *.db
 *.db-shm
-.vscode/.browse.VC.db-wal
+.vscode/*

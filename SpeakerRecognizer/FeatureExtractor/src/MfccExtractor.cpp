@@ -38,7 +38,7 @@ void MfccExtractor::Extract(vector<double>& feature_vec, vector<double>& input, 
 
 	inverseMfcc.SetSpectrumData(power_spectrum);
 	inverseMfcc.GetLogCoefficents(feature_vec);
-	delete power_spectrum;
+	delete[] power_spectrum;
 }
 
 void MfccExtractor::Extract(vector<double>& feature_vec, vector<double>& input) {
@@ -66,7 +66,7 @@ void MfccExtractor::Extract(vector<double>& feature_vec, vector<double>& input) 
 
 	inverseMfcc.SetSpectrumData(power_spectrum);
 	inverseMfcc.GetLogCoefficents(feature_vec);
-	delete power_spectrum;
+	delete[] power_spectrum;
 }
 
 MfccExtractor::MfccExtractor(int feature_size, double window_size) : count(feature_size) {
@@ -74,7 +74,8 @@ MfccExtractor::MfccExtractor(int feature_size, double window_size) : count(featu
 	windowSize = window_size;
 }
 
-MfccExtractor::MfccExtractor(int feature_size, double window_size, int sampling_rate) : MfccExtractor(window_size, feature_size) {
+MfccExtractor::MfccExtractor(int feature_size, double window_size, int sampling_rate) :
+	MfccExtractor(window_size, feature_size) {
 	mfcc.Init(feature_size, window_size * sampling_rate, 0, sampling_rate / 2, sampling_rate);
 	inverseMfcc.Init(feature_size, window_size * sampling_rate, 0, sampling_rate / 2, sampling_rate);
 }

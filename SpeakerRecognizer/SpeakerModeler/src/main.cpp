@@ -1,4 +1,4 @@
-#include "Processor.h"
+#include "SpeakerModeler.h"
 
 using namespace std;
 
@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 	string record_location_file(argv[5]);
 
 	map<int, map<int, vector<vector<double>>>> features;
-	Processor processor(model_folder, model_file);
+	SpeakerModeler processor(model_folder, model_file);
 
 	if (argc == 6) {
 		processor.ExtractFeatures(record_folder, alignment_file, features, record_location_file);

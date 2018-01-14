@@ -18,8 +18,7 @@ public:
 	Mfcc();
 	void Init(int noFilterBanks, int NFFT, double minFreq, double maxFreq, double sampleFreq);
 
-	virtual ~Mfcc() {
-	}
+	virtual ~Mfcc() = default;
 
 	void InitFilterBanks();
 	void SetSpectrumData(double*);

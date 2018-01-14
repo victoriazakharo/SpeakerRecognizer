@@ -35,7 +35,8 @@ bool SoundFile::Initialize(const std::string& file_name) {
 		return false;
 	}
 	name = file_name;
-	SF_INFO info;
+	SF_INFO info = {};
+	
 	SNDFILE* file = sf_open(file_name.c_str(), SFM_READ, &info);
 	if (file) {
 		data.clear();
@@ -45,15 +46,15 @@ bool SoundFile::Initialize(const std::string& file_name) {
 		const size_t buffer_size = 256;
 		double* buffer = new double[buffer_size];
 		size_t total_bytes = 0;
-		size_t read = 0;
+		size_t read;
 		while ((read = sf_read_double(file, buffer, buffer_size)) > 0) {
 			copy_every_n(buffer, buffer + read * info.channels, data.begin() + total_bytes, info.channels);
 			total_bytes += read;
 		}
-		delete buffer;
+		delete[] buffer;
 		sf_close(file);
 	}
-	else {
+	else {		
 		int err;
 		mpg123_init();
 		mpg123_handle* mh = mpg123_new(nullptr, &err);
