@@ -1,0 +1,16 @@
+{
+  "name": "SpeakerRecognizer",
+  "description": "SpeakerRecognizer",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.18.1"
+  },
+  "devDependencies": {
+    "webpack": "^3.1.0"
+  }
+}
