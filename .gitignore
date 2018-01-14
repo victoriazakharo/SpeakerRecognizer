@@ -1,4 +1,3 @@
-/cpp/SpeakerRecognizer/FeatureExtractor/include/export.h
 *.db
 *.db-shm
 /cpp/SpeakerRecognizer/.vscode/
