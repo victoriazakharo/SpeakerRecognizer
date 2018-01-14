@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -46,7 +47,9 @@ public class HomeController {
     public void init() {
         loadDictors();
         try {
-            root = (this.getClass().getClassLoader().getResource("").getPath() + "../../").substring(1);
+            Path buildpath = Paths.get(this.getClass().getClassLoader().getResource("").toURI());
+            Path rootPath = buildpath.getParent().getParent().getParent().getParent();
+            root = (rootPath + "/src/main/resources/static/");
             clientSocket = new Socket(HOST, PORT);
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new DataOutputStream(clientSocket.getOutputStream());
