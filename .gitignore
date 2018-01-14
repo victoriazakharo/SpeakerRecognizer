@@ -1,0 +1,8 @@
+*.db
+*.db-shm
+cpp/SpeakerRecognizer/.vscode/
+java/SpeakerRecognizer/.gradle/
+java/SpeakerRecognizer/.idea/
+java/SpeakerRecognizer/build/
+*.iml
+java/SpeakerRecognizer/out/
