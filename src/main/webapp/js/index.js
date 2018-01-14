@@ -29,7 +29,7 @@ $(document).ready(function() {
     $('#exampleFile').change(function(e) {
         e.preventDefault();
         var exampleSource = this.value;
-        $('#exampleSource').attr("src", "wav/" + exampleSource);
+        $('#exampleSource').attr("src", "wav/" + exampleSource + ".wav");
 
         var player = $('#player');
         player[0].pause();
@@ -38,7 +38,18 @@ $(document).ready(function() {
 
     $('#exampleBtn').click(function(e) {
         e.preventDefault();
-        $('#outputText').val("Somebody");
+        $('#exampleBtn').prop('disabled', true);
+        $('#outputText').val("Waiting...");
+        var src = $('#exampleSource').attr("src");
+        $.ajax({
+            type : "GET",
+            url : "recognize",
+            data : { "path" : src },
+            success: function(data){
+                $('#outputText').val(data);
+                $('#exampleBtn').prop('disabled', false);
+            }
+        });
     });
 
     navigator.mediaDevices.getUserMedia = (navigator.mediaDevices.getUserMedia ||
