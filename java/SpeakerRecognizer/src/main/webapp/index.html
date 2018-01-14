@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Speaker Recognizer</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+              crossorigin="anonymous">
+        <link href="css/theme.css" rel="stylesheet">
+        <script async="" src="//www.google-analytics.com/analytics.js"></script>
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+                crossorigin="anonymous"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css"
+              href="https://silviomoreto.github.io/bootstrap-select/dist/css/bootstrap-select.min.css">
+        <script type="text/javascript"
+                src="https://silviomoreto.github.io/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+    </head>
+    <body>
+    <script type="text/javascript" src="js/index.js"></script>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="https://ssrlab.grid.by/"><img id="main-logo" src="img/main-logo.png"></a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="">Speaker Recognizer</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-haspopup="true" aria-expanded="false">Language<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#En" class="setLocale">English</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container theme-showcase" role="main">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="panel panel-default">
+                    <ul class="nav nav-tabs">
+                        <li id="tabExample" class="active">
+                            <a data-toggle="tab" href="#exampletab" class="active">
+                                <span class="glyphicon glyphicon-bullhorn"></span>
+                                Example                        </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="exampletab" class="tab-pane fade  in active">
+                            <div class="panel-body">
+                                <p>
+                                    <select class="form-control" name="exampleFile" id="exampleFile">
+                                        <option value="faks0_sa1">faks0_sa1</option>
+                                        <option value="faks0_sa2">faks0_sa2</option>
+                                        <option value="fcjf0_sa1">fcjf0_sa1</option>
+                                        <option value="fcjf0_sa2">fcjf0_sa2</option>
+                                        <option value="mcpm0_sa1">mcpm0_sa1</option>
+                                        <option value="mcpm0_sa2">mcpm0_sa2</option>
+                                        <option value="mdab0_sa1">mdab0_sa1</option>
+                                        <option value="mdab0_sa2">mdab0_sa2</option>
+                                    </select>
+                                </p>
+                                <p><audio id="player" controls="">
+                                    <source id="exampleSource" src="wav/faks0_sa1.wav" type="audio/wav">
+                                    Your browser does not support the audio element.</audio></p>
+                                <p><button id="exampleBtn" class="btn btn-primary">Recognize</button></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="control-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Recognized speaker<files></files></h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                <textarea class="form-control" rows="5" id="outputText" placeholder="Recognized speaker"
+                                         readonly=""></textarea>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted">Speaker recognition powered by <a href="http://kaldi-asr.org/">Kaldi</a></p>
+        </div>
+    </footer>
+    </body>
+</html>

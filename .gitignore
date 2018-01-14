@@ -1,0 +1,9 @@
+/cpp/SpeakerRecognizer/FeatureExtractor/include/export.h
+*.db
+*.db-shm
+/cpp/SpeakerRecognizer/.vscode/
+/java/SpeakerRecognizer/.gradle/
+/.idea/
+/java/SpeakerRecognizer/build/
+*.iml
+/java/SpeakerRecognizer/out/
