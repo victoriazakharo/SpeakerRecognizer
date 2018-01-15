@@ -1,5 +1,6 @@
 package speakerid.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -8,34 +9,40 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Controller
 public class HomeController {
-    private Map<Integer, String> dictors;
+    private Map<Integer, String> speakers = new HashMap<>();
     private static Socket clientSocket;
     private static BufferedReader input;
     private static DataOutputStream output;
 
     private static final String HOST = "localhost";
     private static final int PORT = 1024;
-    private static String root;
 
-    private void loadDictors(){
-        dictors = new HashMap<Integer, String>();
-        URL dictorsFile = HomeController.class.getResource("/dictors.txt");
-        try (Stream<String> stream = Files.lines(Paths.get(dictorsFile.toURI()))) {
+    //TODO: rename according to business logic
+    @Value("${file.name}")
+    private String fileName;
+
+    @Value("#{systemProperties['os.name'].contains('Windows') ? '${windows.speakers.directory}' : '${unix.speakers.directory}'}")
+    private String speakersDirectory;
+
+    private void loadSpeakers() {
+        try (Stream<String> stream = Files.lines(Paths.get(speakersDirectory + fileName))) {
             stream.forEach(
                     line -> {
                         String[] words = line.split(" ");
-                        dictors.putIfAbsent(Integer.valueOf(words[0]), words[1]);
+                        speakers.putIfAbsent(Integer.valueOf(words[0]), words[1]);
                     }
             );
         } catch (Exception e) {
@@ -45,11 +52,8 @@ public class HomeController {
 
     @PostConstruct
     public void init() {
-        loadDictors();
+        loadSpeakers();
         try {
-            Path buildpath = Paths.get(this.getClass().getClassLoader().getResource("").toURI());
-            Path rootPath = buildpath.getParent().getParent().getParent().getParent();
-            root = (rootPath + "/src/main/resources/static/");
             clientSocket = new Socket(HOST, PORT);
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new DataOutputStream(clientSocket.getOutputStream());
@@ -59,7 +63,7 @@ public class HomeController {
     }
 
     @PreDestroy
-    public void cleanup(){
+    public void cleanup() {
         try {
             input.close();
             output.close();
@@ -74,9 +78,9 @@ public class HomeController {
     public String recognize(@RequestParam String path) {
         String result = "not found";
         try {
-            output.writeBytes(root + path + "\n");
-            int dictor = Integer.valueOf(input.readLine());
-            result = dictors.get(dictor);
+            output.writeBytes(speakersDirectory + path + "\n");
+            int speaker = Integer.valueOf(input.readLine());
+            result = speakers.get(speaker);
         } catch (IOException e) {
             e.printStackTrace();
         }

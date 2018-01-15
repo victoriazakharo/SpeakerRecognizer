@@ -29,7 +29,7 @@ $(document).ready(function() {
     $('#exampleFile').change(function(e) {
         e.preventDefault();
         var exampleSource = this.value;
-        $('#exampleSource').attr("src", "wav/" + exampleSource + ".wav");
+        $('#exampleSource').attr("src", exampleSource + ".wav");
 
         var player = $('#player');
         player[0].pause();
