@@ -16,4 +16,4 @@ java/SpeakerRecognizer/.idea/
 java/SpeakerRecognizer/build/
 java/SpeakerRecognizer/out/
 *.iml
-.idea/workspace.xml
+.idea/
