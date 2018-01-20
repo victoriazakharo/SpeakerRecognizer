@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static speakerid.config.SpringBootConfig.SpeakersDirectory;
+import static speakerid.config.SpringBootConfig.SpeakersPath;
+
 @Controller
 public class HomeController {
     private Map<Integer, String> speakers = new HashMap<>();
@@ -30,15 +33,8 @@ public class HomeController {
     private static final String HOST = "localhost";
     private static final int PORT = 1024;
 
-    //TODO: rename according to business logic
-    @Value("${file.name}")
-    private String fileName;
-
-    @Value("#{systemProperties['os.name'].contains('Windows') ? '${windows.speakers.directory}' : '${unix.speakers.directory}'}")
-    private String speakersDirectory;
-
     private void loadSpeakers() {
-        try (Stream<String> stream = Files.lines(Paths.get(speakersDirectory + fileName))) {
+        try (Stream<String> stream = Files.lines(Paths.get(SpeakersDirectory + SpeakersPath))) {
             stream.forEach(
                     line -> {
                         String[] words = line.split(" ");
@@ -78,7 +74,7 @@ public class HomeController {
     public String recognize(@RequestParam String path) {
         String result = "not found";
         try {
-            output.writeBytes(speakersDirectory + path + "\n");
+            output.writeBytes(SpeakersDirectory + path + "\n");
             int speaker = Integer.valueOf(input.readLine());
             result = speakers.get(speaker);
         } catch (IOException e) {
