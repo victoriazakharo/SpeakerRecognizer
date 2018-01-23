@@ -1,6 +1,8 @@
 *.db
 *.db-shm
 cpp/*
+!cpp/Dockerfile
+!cpp/bin/Dockerfile
 !cpp/SpeakerRecognizer/
 !cpp/bin/utils/
 !cpp/bin/cat_models.pl
@@ -14,6 +16,7 @@ cpp/SpeakerRecognizer/cmake_install.cmake
 java/SpeakerRecognizer/.gradle/
 java/SpeakerRecognizer/.idea/
 java/SpeakerRecognizer/build/
+!java/SpeakerRecognizer/build/libs/Dockerfile
 java/SpeakerRecognizer/out/
 *.iml
 .idea/
