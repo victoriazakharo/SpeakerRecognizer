@@ -30,7 +30,7 @@ public class HomeController {
     private static BufferedReader input;
     private static DataOutputStream output;
 
-    private static final String HOST = "localhost";
+    private static final String HOST = "127.0.0.1";
     private static final int PORT = 1024;
 
     private void loadSpeakers() {
@@ -44,13 +44,26 @@ public class HomeController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.printf("Loaded %d speakers\n", speakers.size());
     }
 
     @PostConstruct
     public void init() {
         loadSpeakers();
         try {
-            clientSocket = new Socket(HOST, PORT);
+            while (true) {
+                try {
+                    clientSocket = new Socket(HOST, PORT);
+                    if (clientSocket != null) {
+                        System.out.println("Connected to server socket");
+                        break;
+                    }
+                }
+                catch (Exception e) {
+                    System.out.println("waiting for server socket...");
+                    Thread.sleep(1000);
+                }
+            }
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new DataOutputStream(clientSocket.getOutputStream());
         } catch (Exception e) {
