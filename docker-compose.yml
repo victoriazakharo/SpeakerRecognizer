@@ -1,0 +1,19 @@
+version: '3'
+services:
+  logic:
+    build: ./cpp/bin
+    image: cpprun
+    ports: 
+     - "127.0.0.1:1024:1024"
+    volumes:
+     - ${RESOURCE_PATH}:/temp  
+    command: /temp/models/ model.txt
+  web:
+    build: ./java/SpeakerRecognizer/build/libs
+    image: javarun
+    ports: 
+     - "127.0.0.1:8080:8080"
+    volumes:
+     - ${RESOURCE_PATH}:/temp
+    network_mode: "host"     
+    command: /temp/
