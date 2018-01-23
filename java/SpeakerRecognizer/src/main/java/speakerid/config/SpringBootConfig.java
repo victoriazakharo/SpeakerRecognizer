@@ -43,7 +43,7 @@ public class SpringBootConfig extends SpringBootServletInitializer {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-                String audioPath = "file:/" + SpeakersDirectory + "audio/";
+                String audioPath = "file:" + SpeakersDirectory + "audio/";
                 registry.addResourceHandler("/audio/**").addResourceLocations(audioPath);
             }
         };

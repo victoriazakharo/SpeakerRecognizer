@@ -17,3 +17,5 @@ java/SpeakerRecognizer/build/
 java/SpeakerRecognizer/out/
 *.iml
 .idea/
+.gradle/
+
