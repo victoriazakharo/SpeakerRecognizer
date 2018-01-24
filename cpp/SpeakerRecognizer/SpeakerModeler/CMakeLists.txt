@@ -1,13 +1,10 @@
 include_directories(include)
 include_directories(${PROJECT_SOURCE_DIR}/${FEATURE_LIB}/include)
-include_directories(${PROJECT_SOURCE_DIR}/${LIB_FOLDER}/essentia/include)
 
 if(WIN32)
    include_directories(${PROJECT_SOURCE_DIR}/${LIB_FOLDER}/armadillo/include)
    link_directories(${PROJECT_SOURCE_DIR}/${LIB_FOLDER}/armadillo/Debug)
    link_directories(${PROJECT_SOURCE_DIR}/${LIB_FOLDER}/armadillo/Release) 
-elseif(UNIX) 
-   link_directories(${PROJECT_SOURCE_DIR}/${LIB_FOLDER}/essentia) 
 endif()
 
 file(GLOB SOURCE_FILES src/*.cpp)
@@ -26,7 +23,7 @@ elseif(UNIX)
    include_directories(${ARMADILLO_INCLUDE_DIRS})
    include_directories(${BLAS_INCLUDE_DIR})
    include_directories(${LAPACK_INCLUDE_DIR})
-   target_link_libraries(${MODELER_APP} ${FEATURE_LIB} ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} essentia fftw3 yaml avcodec avformat avutil avresample samplerate tag fftw3f)
+   target_link_libraries(${MODELER_APP} ${FEATURE_LIB} ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} libfftw3.a)
 endif()
 
 

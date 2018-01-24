@@ -17,8 +17,8 @@ elseif(UNIX)
     add_definitions(-std=c++11)
 endif()
 
-add_definitions(-DARMA_EXTRA_MAT_PROTO=../../../${LIB_FOLDER}/arma-extend/Mat_extra_bones.hpp)
-add_definitions(-DARMA_EXTRA_MAT_MEAT=../../../${LIB_FOLDER}/arma-extend/Mat_extra_meat.hpp)
+add_definitions(-DARMA_EXTRA_MAT_PROTO=${CMAKE_SOURCE_DIR}/${LIB_FOLDER}/arma-extend/Mat_extra_bones.hpp)
+add_definitions(-DARMA_EXTRA_MAT_MEAT=${CMAKE_SOURCE_DIR}/${LIB_FOLDER}/arma-extend/Mat_extra_meat.hpp)
 
 add_subdirectory(${FEATURE_LIB})
 add_subdirectory(${MODELER_APP})

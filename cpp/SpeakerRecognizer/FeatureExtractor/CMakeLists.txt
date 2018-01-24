@@ -29,7 +29,7 @@ elseif(UNIX)
    include_directories(${SNDFILE_INCLUDE_DIRS})
    include_directories(${MPG123_INCLUDE_DIR})
    include_directories(${LIBFFTW3_INCLUDE_DIR})
-   target_link_libraries(${FEATURE_LIB} PRIVATE ${SNDFILE_LIBRARIES} ${FFTW3_LIBRARY} ${MPG123_LIBRARY})
+   target_link_libraries(${FEATURE_LIB} PRIVATE ${SNDFILE_LIBRARIES} ${LIBFFTW3_LIBRARY} ${MPG123_LIBRARY})
 endif()
 
 include (GenerateExportHeader)

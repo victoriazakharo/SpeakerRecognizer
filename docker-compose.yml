@@ -1,15 +1,16 @@
 version: '3'
 services:
   logic:
-    build: ./cpp/bin
+    build: ./cpp
     image: cpprun
     ports: 
      - "127.0.0.1:1024:1024"
     volumes:
      - ${RESOURCE_PATH}:/temp  
     command: /temp/models/ model.txt
+    tty: true    
   web:
-    build: ./java/SpeakerRecognizer/build/libs
+    build: ./java
     image: javarun
     ports: 
      - "127.0.0.1:8080:8080"
