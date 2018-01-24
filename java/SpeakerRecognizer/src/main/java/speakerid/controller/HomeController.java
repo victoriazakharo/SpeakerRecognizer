@@ -30,7 +30,7 @@ public class HomeController {
     private static BufferedReader input;
     private static DataOutputStream output;
 
-    private static final String HOST = "127.0.0.1";
+    private static final String HOST = "logic";
     private static final int PORT = 1024;
 
     private void loadSpeakers() {

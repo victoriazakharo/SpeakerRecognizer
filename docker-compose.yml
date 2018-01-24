@@ -4,17 +4,16 @@ services:
     build: ./cpp
     image: cpprun
     ports: 
-     - "127.0.0.1:1024:1024"
+     - "1024:1024"
     volumes:
-     - ${RESOURCE_PATH}:/temp  
+     - ./temp/:/temp  
     command: /temp/models/ model.txt
     tty: true    
   web:
     build: ./java
     image: javarun
     ports: 
-     - "127.0.0.1:8080:8080"
+     - "8089:8080"
     volumes:
-     - ${RESOURCE_PATH}:/temp
-    network_mode: "host"     
+     - ./temp/:/temp     
     command: /temp/
