@@ -71,13 +71,17 @@
                                 <p><button id="testBtn" class="btn btn-primary">Recognize</button></p>
                             </div>
                         </div>
-                        <div id="speakersTab" class="tab-pane fade">
+                        <div id="speakersTab" class="tab-pane fade row">
                             <div class="panel-body">
-                                <table id="speakerFiles">
+                                <table class="table table-fixed">
+                                    <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Example record</th>
+                                        <th class="col-xs-2">Name</th>
+                                        <th class="col-xs-10">Example record</th>
                                     </tr>
+                                    </thead>
+                                    <tbody id="speakerFiles">
+                                    </tbody>
                                 </table>
                             </div>
                         </div>

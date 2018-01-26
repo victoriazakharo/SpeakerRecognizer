@@ -32,9 +32,9 @@ $(document).ready(function () {
                     "controls": ""
                 });
                 var row = $("<tr>");
-                var name = $("<td>").append(data[i][1]);
-                var record = $("<td>").append(audio);
-                row.append(name).append(audio);
+                var name = $("<td>").append(data[i][1]).addClass("col-xs-2");
+                var record = $("<td>").append(audio).addClass("col-xs-10");
+                row.append(name).append(record);
                 $("#speakerFiles").append(row);
             }
         }

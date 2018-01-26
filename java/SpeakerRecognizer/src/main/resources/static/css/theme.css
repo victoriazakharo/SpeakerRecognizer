@@ -77,8 +77,19 @@ code {
     margin-top: -7px;
 }
 
-#speakerFiles {
-    max-height: 500px;
-    overflow-y: scroll;
+.table-fixed {
+    margin-bottom: 0;
+}
+
+.table-fixed tbody {
+    height: 500px;
+    overflow-y: auto;
+    width: 100%;
+}
+.table-fixed thead, .table-fixed tbody, .table-fixed tr, .table-fixed td, .table-fixed th {
     display: block;
+}
+.table-fixed tbody td, .table-fixed thead > tr > th {
+    float: left;
+    border-width: 0;
 }
