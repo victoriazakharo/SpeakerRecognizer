@@ -48,30 +48,37 @@
                 <div class="panel panel-default">
                     <ul class="nav nav-tabs">
                         <li id="tabExample" class="active">
-                            <a data-toggle="tab" href="#exampletab" class="active">
+                            <a data-toggle="tab" href="#exampleTab" class="active">
                                 <span class="glyphicon glyphicon-bullhorn"></span>
                                 Example                        </a>
                         </li>
+                        <li id="tabSpeakers">
+                            <a data-toggle="tab" href="#speakersTab">
+                                <span class="glyphicon glyphicon-user"></span>
+                                Speakers                        </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
-                        <div id="exampletab" class="tab-pane fade  in active">
+                        <div id="exampleTab" class="tab-pane fade  in active">
                             <div class="panel-body">
                                 <p>
-                                    <select class="form-control" name="exampleFile" id="exampleFile">
-                                        <option value="faks0_sa1">faks0_sa1</option>
-                                        <option value="faks0_sa2">faks0_sa2</option>
-                                        <option value="fcjf0_sa1">fcjf0_sa1</option>
-                                        <option value="fcjf0_sa2">fcjf0_sa2</option>
-                                        <option value="mcpm0_sa1">mcpm0_sa1</option>
-                                        <option value="mcpm0_sa2">mcpm0_sa2</option>
-                                        <option value="mdab0_sa1">mdab0_sa1</option>
-                                        <option value="mdab0_sa2">mdab0_sa2</option>
+                                    <select class="form-control" name="testFiles" id="testFiles">
                                     </select>
                                 </p>
                                 <p><audio id="player" controls="">
-                                    <source id="exampleSource" src="audio/faks0_sa1.wav" type="audio/wav">
+                                    <source id="testSource" type="audio/wav" />
                                     Your browser does not support the audio element.</audio></p>
-                                <p><button id="exampleBtn" class="btn btn-primary">Recognize</button></p>
+                                <p><button id="testBtn" class="btn btn-primary">Recognize</button></p>
+                            </div>
+                        </div>
+                        <div id="speakersTab" class="tab-pane fade">
+                            <div class="panel-body">
+                                <table id="speakerFiles">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Example record</th>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>

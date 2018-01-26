@@ -76,3 +76,9 @@ code {
     max-width: 200px;
     margin-top: -7px;
 }
+
+#speakerFiles {
+    max-height: 500px;
+    overflow-y: scroll;
+    display: block;
+}

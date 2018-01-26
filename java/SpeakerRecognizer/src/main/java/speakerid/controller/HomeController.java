@@ -1,6 +1,5 @@
 package speakerid.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -9,10 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -80,6 +76,36 @@ public class HomeController {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    @RequestMapping(value = "/getTestRecords", method = RequestMethod.GET)
+    @ResponseBody
+    public String[] getTestRecords(){
+        File testFolder = new File(SpeakersDirectory + "audio/test");
+        File[] records = testFolder.listFiles();
+        String[] fileNames = new String[records.length];
+        for(int i = 0; i < records.length; i++){
+            fileNames[i] = records[i].getName();
+        }
+        return fileNames;
+    }
+
+    @RequestMapping(value = "/getSpeakerRecords", method = RequestMethod.GET)
+    @ResponseBody
+    public String[][] getSpeakerRecords(){
+        File testFolder = new File(SpeakersDirectory + "audio/example");
+        File[] records = testFolder.listFiles();
+        String[][] result = new String[records.length][2];
+        String extensionRegex = "[.][^.]+$";
+        for(int i = 0; i < records.length; i++){
+            String filename = records[i].getName();
+            String speaker = filename.replaceFirst(extensionRegex, "");
+            String[] record = new String[2];
+            record[0] = filename;
+            record[1] = speakers.get(Integer.valueOf(speaker));
+            result[i] = record;
+        }
+        return result;
     }
 
     @RequestMapping(value = "/recognize", method = RequestMethod.GET)

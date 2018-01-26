@@ -1,21 +1,48 @@
 'use strict'
 
 function setLocale(locale) {
-    window.location.href = window.location.pathname + "?lang=" + locale.substr(0,2);
+    window.location.href = window.location.pathname + "?lang=" + locale.substr(0, 2);
 }
 
-function selectUploadFileTab() {
-    var type = window.location.hash.substr(1);
-    if (type == 'uploadtab') {
-        $('#exampletab').removeClass('in active');
-        $('#tabExample').removeClass('active');
-    }
-}
+$(document).ready(function () {
+    var testFileSelect = $('#testFiles');
+    var selectedRecord = $('#testSource');
+    var player = $('#player');
+    $.ajax({
+        type: "GET",
+        url: "getTestRecords",
+        success: function (data) {
+            for (var i = 0; i < data.length; i++) {
+                testFileSelect.append($('<option>', { value: data[i] }).text(data[i]));
+            }
+            if (data.length > 0) {
+                selectedRecord.attr("src", "audio/test/" + data[0]);
+                player[0].load();
+            }
+        }
+    });
+    $.ajax({
+        type: "GET",
+        url: "getSpeakerRecords",
+        success: function (data) {
+            for (var i = 0; i < data.length; i++) {
+                var audio = $("<audio>");
+                audio.attr({
+                    "src": "audio/example/" + data[i][0],
+                    "controls": ""
+                });
+                var row = $("<tr>");
+                var name = $("<td>").append(data[i][1]);
+                var record = $("<td>").append(audio);
+                row.append(name).append(audio);
+                $("#speakerFiles").append(row);
+            }
+        }
+    });
 
-$(document).ready(function() {
-    $('.setLocale').click(function(e) {
+    $('.setLocale').click(function (e) {
         e.preventDefault();
-        var localeId = $( this ).attr('href');
+        var localeId = $(this).attr('href');
         switch (localeId) {
             case "#En":
                 setLocale("en_US.UTF-8");
@@ -26,34 +53,30 @@ $(document).ready(function() {
         }
     });
 
-    $('#exampleFile').change(function(e) {
+    testFileSelect.change(function (e) {
         e.preventDefault();
-        var exampleSource = this.value;
-        $('#exampleSource').attr("src", "audio/" + exampleSource + ".wav");
-
-        var player = $('#player');
+        var selectedSource = this.value;
+        selectedRecord.attr("src", "audio/test/" + selectedSource);
         player[0].pause();
         player[0].load();
     });
 
-    $('#exampleBtn').click(function(e) {
+    $('#testBtn').click(function (e) {
         e.preventDefault();
-        $('#exampleBtn').prop('disabled', true);
+        $('#testBtn').prop('disabled', true);
         $('#outputText').val("Waiting...");
-        var src = $('#exampleSource').attr("src");
+        var src = selectedRecord.attr("src");
         $.ajax({
-            type : "GET",
-            url : "recognize",
-            data : { "path" : src },
-            success: function(data){
+            type: "GET",
+            url: "recognize",
+            data: { "path": src },
+            success: function (data) {
                 $('#outputText').val(data);
-                $('#exampleBtn').prop('disabled', false);
+                $('#testBtn').prop('disabled', false);
             }
         });
     });
 
     navigator.mediaDevices.getUserMedia = (navigator.mediaDevices.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia);
+        navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
 });
