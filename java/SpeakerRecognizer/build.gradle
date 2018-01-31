@@ -12,6 +12,10 @@ buildscript {
     }
 }
 
+bootRun {
+    systemProperties = System.properties as Map<String, ?>
+}
+
 war {
     baseName = 'speaker-recognizer'
     version = version

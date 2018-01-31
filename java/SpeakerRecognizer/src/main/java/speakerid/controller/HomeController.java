@@ -1,5 +1,6 @@
 package speakerid.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,9 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static speakerid.config.SpringBootConfig.SpeakersDirectory;
-import static speakerid.config.SpringBootConfig.SpeakersPath;
-
 @Controller
 public class HomeController {
     private Map<Integer, String> speakers = new HashMap<>();
@@ -29,8 +27,14 @@ public class HomeController {
     private static final String HOST = "logic";
     private static final int PORT = 1024;
 
+    @Value("${speakers.directory}")
+    private String speakersDirectory;
+
+    @Value("${speakers.filename}")
+    private String speakersFilename;
+
     private void loadSpeakers() {
-        try (Stream<String> stream = Files.lines(Paths.get(SpeakersDirectory + SpeakersPath))) {
+        try (Stream<String> stream = Files.lines(Paths.get(speakersDirectory + speakersFilename))) {
             stream.forEach(
                     line -> {
                         String[] words = line.split(" ");
@@ -54,8 +58,7 @@ public class HomeController {
                         System.out.println("Connected to server socket");
                         break;
                     }
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     System.out.println("waiting for server socket...");
                     Thread.sleep(1000);
                 }
@@ -80,11 +83,11 @@ public class HomeController {
 
     @RequestMapping(value = "/getTestRecords", method = RequestMethod.GET)
     @ResponseBody
-    public String[] getTestRecords(){
-        File testFolder = new File(SpeakersDirectory + "audio/test");
+    public String[] getTestRecords() {
+        File testFolder = new File(speakersDirectory + "audio/test");
         File[] records = testFolder.listFiles();
         String[] fileNames = new String[records.length];
-        for(int i = 0; i < records.length; i++){
+        for (int i = 0; i < records.length; i++) {
             fileNames[i] = records[i].getName();
         }
         return fileNames;
@@ -92,12 +95,12 @@ public class HomeController {
 
     @RequestMapping(value = "/getSpeakerRecords", method = RequestMethod.GET)
     @ResponseBody
-    public String[][] getSpeakerRecords(){
-        File testFolder = new File(SpeakersDirectory + "audio/example");
+    public String[][] getSpeakerRecords() {
+        File testFolder = new File(speakersDirectory + "audio/example");
         File[] records = testFolder.listFiles();
         String[][] result = new String[records.length][2];
         String extensionRegex = "[.][^.]+$";
-        for(int i = 0; i < records.length; i++){
+        for (int i = 0; i < records.length; i++) {
             String filename = records[i].getName();
             String speaker = filename.replaceFirst(extensionRegex, "");
             String[] record = new String[2];
@@ -113,7 +116,7 @@ public class HomeController {
     public String recognize(@RequestParam String path) {
         String result = "not found";
         try {
-            output.writeBytes(SpeakersDirectory + path + "\n");
+            output.writeBytes(speakersDirectory + path + "\n");
             int speaker = Integer.valueOf(input.readLine());
             result = speakers.get(speaker);
         } catch (IOException e) {
