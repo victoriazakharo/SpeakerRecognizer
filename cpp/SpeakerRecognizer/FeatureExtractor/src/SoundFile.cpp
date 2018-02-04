@@ -23,10 +23,10 @@ SoundFile::SoundFile() : samplingRate(44100) {
 }
 
 template <class in_it, class out_it>
-out_it copy_every_n(in_it b, in_it e, out_it r, size_t n) {
-	for (size_t i = std::distance(b, e) / n; i--; std::advance(b, n))
-		*r++ = *b;
-	return r;
+void copy_every_n(in_it b, in_it e, out_it r, size_t n) {	
+	for (size_t i = std::distance(b, e) / n; i--; std::advance(b, n)) {
+		*r++ = *b;		
+	}
 }
 
 bool SoundFile::Initialize(const std::string& file_name) {
@@ -41,15 +41,15 @@ bool SoundFile::Initialize(const std::string& file_name) {
 	if (file) {
 		data.clear();
 		samplingRate = info.samplerate;
-		data.resize(info.channels * info.frames);
-
+		data.resize(info.frames);
 		const size_t buffer_size = 256;
-		double* buffer = new double[buffer_size];
+		const auto buffer = new double[buffer_size];
 		size_t total_bytes = 0;
 		size_t read;
+		sf_command(file, SFC_SET_NORM_DOUBLE, nullptr, SF_FALSE);
 		while ((read = sf_read_double(file, buffer, buffer_size)) > 0) {
-			copy_every_n(buffer, buffer + read * info.channels, data.begin() + total_bytes, info.channels);
-			total_bytes += read;
+			copy_every_n(buffer, buffer + read, data.begin() + total_bytes, info.channels);
+			total_bytes += read / info.channels;
 		}
 		delete[] buffer;
 		sf_close(file);
@@ -78,7 +78,7 @@ bool SoundFile::Initialize(const std::string& file_name) {
 				copy_every_n(ptr, ptr + done / short_size, data.begin() + total_bytes, channels);
 				total_bytes += done / tmp;
 			}
-			delete buffer;
+			delete[] buffer;
 			mpg123_close(mh);
 			mpg123_delete(mh);
 			mpg123_exit();

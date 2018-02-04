@@ -20,7 +20,9 @@
                 src="https://silviomoreto.github.io/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
     </head>
     <body>
-    <script type="text/javascript" src="js/index.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/recorder.js"></script>
+    <script src="js/index.js"></script>
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
@@ -57,6 +59,16 @@
                                 <span class="glyphicon glyphicon-user"></span>
                                 Speakers                        </a>
                         </li>
+                        <li id="tabRecord">
+                            <a data-toggle="tab" href="#recordTab">
+                                <span class="glyphicon glyphicon-record"></span>
+                                Record                        </a>
+                        </li>
+                        <li id="tabUpload">
+                            <a data-toggle="tab" href="#uploadtab">
+                                <span class="glyphicon glyphicon-upload"></span>
+                                Upload file                        </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="exampleTab" class="tab-pane fade  in active">
@@ -75,14 +87,52 @@
                             <div class="panel-body">
                                 <table class="table table-fixed">
                                     <thead>
-                                    <tr>
-                                        <th class="col-xs-2">Name</th>
-                                        <th class="col-xs-10">Example record</th>
-                                    </tr>
+                                        <tr>
+                                            <th class="col-xs-2">Name</th>
+                                            <th class="col-xs-10">Example record</th>
+                                        </tr>
                                     </thead>
                                     <tbody id="speakerFiles">
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                        <div id="recordTab" class="tab-pane fade">
+                            <div class="panel-body">
+                                <div id="recorder">
+                                    <p>
+                                        <button id="record" type="button" class="btn btn-danger">Record</button>
+                                        <button id="stop" type="button" class="btn btn-info" >Stop</button>
+                                    </p>
+                                    <p><audio id="recorderPlayer" controls="">
+                                        <source id="recorderSource" src="" type="audio/wav">
+                                        Your browser does not support the audio element.        </audio>
+                                    </p>
+                                    <p>
+                                        <button id="recognizeRecordedBtn" class="btn btn-primary">Recognize</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="uploadtab" class="tab-pane fade">
+                            <div class="panel-body">
+                                <form id="uploadForm" enctype="multipart/form-data" method="POST" >
+                                    <div class="input-group">
+                                        <label class="input-group-btn">
+                                        <span class="btn btn-primary">
+                                            Browse &hellip; <input type="file"
+                                                                   name="data"
+                                                                   accept="audio/wav,audio/mp3,audio/aiff,audio/flac,audio/ogg"
+                                                                   style="display: none;">
+                                        </span>
+                                        </label>
+                                        <input type="text" class="form-control" readonly>
+                                    </div>
+                                    <div>&nbsp;</div>
+                                    <div>Supported formats: wav, mp3, flac, ogg, aiff</div>
+                                    <div>&nbsp;</div>
+                                    <button id="uploadBtn" type="submit" class="btn btn-primary" disabled>Recognize</button>
+                                </form>
                             </div>
                         </div>
                     </div>
