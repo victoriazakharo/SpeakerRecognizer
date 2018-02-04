@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -117,6 +118,23 @@ public class HomeController {
             int speaker = Integer.valueOf(input.readLine());
             result = speakers.get(speaker);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/recognizeUploaded", method = RequestMethod.POST)
+    @ResponseBody
+    public String recognizeRecorded(@RequestParam("data") MultipartFile multipartFile) {
+        String path = SpeakersDirectory + "uploaded.wav";
+        String result = null;
+        try {
+            File uploadedFile = new File(path);
+            multipartFile.transferTo(uploadedFile);
+            output.writeBytes(path + "\n");
+            int speaker = Integer.valueOf(input.readLine());
+            result = speakers.get(speaker);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
