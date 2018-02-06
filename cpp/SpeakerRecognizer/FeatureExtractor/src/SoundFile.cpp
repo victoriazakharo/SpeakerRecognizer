@@ -23,10 +23,10 @@ SoundFile::SoundFile() : samplingRate(44100) {
 }
 
 template <class in_it, class out_it>
-out_it copy_every_n(in_it b, in_it e, out_it r, size_t n) {
-	for (size_t i = std::distance(b, e) / n; i--; std::advance(b, n))
+void copy_every_n(in_it b, in_it e, out_it r, size_t n) {	
+	for (size_t i = std::distance(b, e) / n; i--; std::advance(b, n)) {
 		*r++ = *b;
-	return r;
+	}
 }
 
 bool SoundFile::Initialize(const std::string& file_name) {
@@ -41,15 +41,15 @@ bool SoundFile::Initialize(const std::string& file_name) {
 	if (file) {
 		data.clear();
 		samplingRate = info.samplerate;
-		data.resize(info.channels * info.frames);
-
+		data.resize(info.frames);
 		const size_t buffer_size = 256;
-		double* buffer = new double[buffer_size];
+		const auto buffer = new double[buffer_size];
 		size_t total_bytes = 0;
 		size_t read;
+		sf_command(file, SFC_SET_NORM_DOUBLE, nullptr, SF_FALSE);
 		while ((read = sf_read_double(file, buffer, buffer_size)) > 0) {
-			copy_every_n(buffer, buffer + read * info.channels, data.begin() + total_bytes, info.channels);
-			total_bytes += read;
+			copy_every_n(buffer, buffer + read, data.begin() + total_bytes, info.channels);
+			total_bytes += read / info.channels;
 		}
 		delete[] buffer;
 		sf_close(file);
@@ -63,22 +63,27 @@ bool SoundFile::Initialize(const std::string& file_name) {
 			long rate;
 			int channels, encoding;
 			mpg123_getformat(mh, &rate, &channels, &encoding);
-			samplingRate = rate;
-			auto samples = mpg123_length(mh);
-			data.resize(samples);
-
-			const size_t buffer_size = mpg123_outblock(mh);
-			unsigned char* buffer = new unsigned char[buffer_size];
-			short* ptr = reinterpret_cast<short*>(buffer);
-			size_t total_bytes = 0;
-			size_t done;
-			size_t short_size = sizeof(short);
-			size_t tmp = short_size * channels;
-			for (; mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK;) {
-				copy_every_n(ptr, ptr + done / short_size, data.begin() + total_bytes, channels);
-				total_bytes += done / tmp;
+			if (encoding != MPG123_ENC_SIGNED_16) {
+				printf("unsupported mp3 format\n");
+				mpg123_close(mh);
+				mpg123_delete(mh);
+				mpg123_exit();
 			}
-			delete buffer;
+			samplingRate = rate;
+			const auto samples = mpg123_length(mh);
+			data.resize(samples);			
+			const size_t buffer_size = mpg123_outblock(mh);
+			const auto buffer = new unsigned char[buffer_size];
+			short* ptr = reinterpret_cast<short*>(buffer);
+			size_t total_samples_read = 0;
+			size_t bytes_read;
+			const size_t short_size = sizeof(short);
+			const size_t double_size = sizeof(double);
+			for (; mpg123_read(mh, buffer, buffer_size, &bytes_read) == MPG123_OK;) {
+				copy_every_n(ptr, ptr + bytes_read / short_size, data.begin() + total_samples_read, channels);
+				total_samples_read += bytes_read / double_size / channels;
+			}
+			delete[] buffer;
 			mpg123_close(mh);
 			mpg123_delete(mh);
 			mpg123_exit();
