@@ -14,6 +14,8 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -129,7 +131,8 @@ public class HomeController {
     @RequestMapping(value = "/recognizeUploaded", method = RequestMethod.POST)
     @ResponseBody
     public String recognizeRecorded(@RequestParam("data") MultipartFile multipartFile) {
-        String path = speakersDirectory + "uploaded.wav";
+        String time = new SimpleDateFormat("HH-mm-ss.SSS").format(new Date());
+        String path = String.format("%s%d_%s.wav", speakersDirectory, Thread.currentThread().getId(), time);
         String result = null;
         try {
             File uploadedFile = new File(path);
@@ -137,6 +140,7 @@ public class HomeController {
             output.writeBytes(path + "\n");
             int speaker = Integer.valueOf(input.readLine());
             result = speakers.get(speaker);
+            uploadedFile.delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
