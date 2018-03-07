@@ -1,28 +1,28 @@
 #pragma once
 #include <string>
-#include "FeatureExtractor.h"
 #include <armadillo>
 #include <memory>
 #include <map>
+#include "MfccExtractor.h"
+
+using std::vector;
+using std::string;
+using std::map;
 
 class SpeakerRecognizer {
-	double windowSize;
-	double hop;
+	const double windowSize;
+	const double hop;
 	double (*windowFunc)(int k, int n);
-	int featureSize;
-	const std::string modelPath;
-	const std::string modelFolder;
-	std::vector<int> answers;
-	std::map<int, std::vector<arma::gmm_diag>> dictors;
-	std::vector<std::shared_ptr<FeatureExtractor>> extractors;
-	void ExtractFeatures(const std::string& path, std::vector<std::vector<double>>& tests);
-	int TellSpeaker(const std::vector<std::vector<double>>& tests) const;
+	const string modelPath;
+	const string modelFolder;
+	const map<int, vector<arma::gmm_diag>> dictors;
+	MfccExtractor mfccExtractor;
+	void ExtractFeatures(const string& path, vector<vector<double>>& tests);
+	int TellSpeaker(const vector<vector<double>>& tests) const;
 public:
-	SpeakerRecognizer(const std::string& model_folder, const std::string& model_file);
-	void Initialize();
-	int GetFirstResult();
-	void SaveResult(const std::string& result_file);
-	void Test(const std::string& test_file_name);
-	void Test(const std::string& test_file_names, const std::string& folder);
-	void TestPreextracted(const std::string& feature_path);
+	SpeakerRecognizer(const string& model_folder, const string& model_file,
+		bool use_imfcc = true);
+	int Test(const string& test_file_name);
+	vector<int> Test(const string& test_file_names, const string& folder);
+	vector<int> TestPreextracted(const string& feature_path);
 };

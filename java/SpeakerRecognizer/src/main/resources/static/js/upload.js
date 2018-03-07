@@ -5,10 +5,7 @@ $(function() {
         input.trigger('fileselect', label);
     });
 
-    $(document).ready( function() {
-        var uploadForm = $("#uploadForm");
-        var uploadBtn = $('#uploadBtn');
-
+    $(function() {
         $(':file').on('fileselect', function(event, label) {
             var input = $(this).parents('.input-group').find(':text');
             if(this.files[0].size > 3000000){
@@ -24,12 +21,12 @@ $(function() {
             }
             uploadBtn.prop('disabled', false);
         });
-
         uploadForm.submit(function(e) {
-            uploadBtn.prop('disabled', true);
-            $('#outputText').val("Waiting...");
+            waiter.start();
+            var source = uploadedSource.find(":selected").val();
             e.preventDefault();
             var fd = new FormData(uploadForm[0]);
+            fd.set("source", source);
             $.post({
                 url: 'recognizeUploaded',
                 data: fd,
@@ -38,8 +35,8 @@ $(function() {
                 contentType: false,
                 cache: false,
             }).done(function(data) {
-                uploadBtn.prop('disabled', false);
-                $('#outputText').val(data);
+                outputText.val(data);
+                waiter.stop();
             });
         });
     });

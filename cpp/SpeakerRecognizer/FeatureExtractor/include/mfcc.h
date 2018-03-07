@@ -5,8 +5,7 @@
 using std::vector;
 
 class Mfcc {
-protected:
-	double* data;
+protected:	
 	int noFilterBanks; 
 	int NFFT; 
 	double minFreq; 
@@ -14,13 +13,11 @@ protected:
 	double sampleFreq;
 	vector<vector<double>> filterBanks; 
 	virtual double MelScale(double freq) const;
-public:
-	Mfcc();
-	void Init(int noFilterBanks, int NFFT, double minFreq, double maxFreq, double sampleFreq);
+	virtual void InitFilterBanks();
+public:	
+	void Init(int noFilterBanks, double windowSize, double sampleFreq);
 
 	virtual ~Mfcc() = default;
-
-	void InitFilterBanks();
-	void SetSpectrumData(double*);
-	void GetLogCoefficents(vector<double>& v);
+	
+	void GetLogCoefficents(const double* data, vector<double>& v);
 };

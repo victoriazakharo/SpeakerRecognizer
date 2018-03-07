@@ -8,15 +8,11 @@
 #include <math.h>
 #include "mfcc.h"
 
-Mfcc::Mfcc() {
-	this->data = nullptr;
-}
-
-void Mfcc::Init(int noFilterBanks, int NFFT, double minFreq, double maxFreq, double sampleFreq) {
+void Mfcc::Init(int noFilterBanks, double windowSize, double sampleFreq) {
 	this->noFilterBanks = noFilterBanks;
-	this->NFFT = NFFT;
-	this->minFreq = minFreq;
-	this->maxFreq = maxFreq;
+	this->NFFT = windowSize * sampleFreq;
+	this->minFreq = 0;
+	this->maxFreq = sampleFreq / 2;
 	this->sampleFreq = sampleFreq;
 	InitFilterBanks();
 }
@@ -56,14 +52,10 @@ void Mfcc::InitFilterBanks() {
 	}
 }
 
-void Mfcc::SetSpectrumData(double* data) {
-	this->data = data;
-}
+void Mfcc::GetLogCoefficents(const double* data, vector<double>& v) {
 
-void Mfcc::GetLogCoefficents(vector<double>& v) {
-
-	if (this->data == nullptr) {
-		printf("No Data!\n");
+	if (data == nullptr) {
+		fprintf(stderr, "No data!\n");
 		exit(-1);
 	}
 	// Initialize pre-discrete cosine transformation vector array
@@ -103,5 +95,5 @@ void Mfcc::GetLogCoefficents(vector<double>& v) {
 }
 
 double Mfcc::MelScale(double freq) const {
-	return 2595 * log(1.0 + freq / 700.0);
+	return 2595 * log10(1.0 + freq / 700.0);
 }

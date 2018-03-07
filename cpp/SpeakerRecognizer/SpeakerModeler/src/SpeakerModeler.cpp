@@ -25,7 +25,7 @@ void ReadRecordPaths(map<int, string>& files, const string& file_path) {
 		}
 	}
 	else {
-		printf("Cannot open file %s\n", file_path.c_str());
+		fprintf(stderr, "Cannot open file %s\n", file_path.c_str());
 	}
 	fi.close();
 }
@@ -94,7 +94,7 @@ void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignme
 		f.close();
 	}
 	else {
-		printf("Cannot open file %s\n", alignment_path.c_str());
+		fprintf(stderr, "Cannot open file %s\n", alignment_path.c_str());
 	}
 }
 
@@ -122,16 +122,19 @@ void SpeakerModeler::ReadFeatures(const string& alignment_path,
 		f.close();
 	}
 	else {
-		printf("Cannot open file %s\n", alignment_path.c_str());
+		fprintf(stderr, "Cannot open file %s\n", alignment_path.c_str());
 	}
 }
 
-SpeakerModeler::SpeakerModeler(const string& model_folder, const string& model_file) : 
+SpeakerModeler::SpeakerModeler(const string& model_folder,
+	const string& model_file, bool use_imfcc) :
 	// TODO: move to config file
 	windowSize(0.025), hop(0.01), gaussians(3), windowFunc(HammingWindow),
 	featureSize(13), modelPath(model_folder + model_file), modelFolder(model_folder) {
 
-	std::shared_ptr<FeatureExtractor> extractor_ptr;
-	extractor_ptr.reset(new MfccExtractor(featureSize, windowSize, 16000));
-	extractors.push_back(extractor_ptr);
+	auto ptr = std::make_shared<MfccExtractor>();
+
+	//TODO: ensure fixed sample rate 
+	ptr->Init(windowSize, 16000, use_imfcc);	
+	extractors.push_back(ptr);
 }

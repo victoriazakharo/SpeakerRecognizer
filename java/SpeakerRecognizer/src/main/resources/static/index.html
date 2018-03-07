@@ -4,25 +4,16 @@
         <title>Speaker Recognizer</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-              crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link href="css/theme.css" rel="stylesheet">
         <script async="" src="//www.google-analytics.com/analytics.js"></script>
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css"
-              href="https://silviomoreto.github.io/bootstrap-select/dist/css/bootstrap-select.min.css">
-        <script type="text/javascript"
-                src="https://silviomoreto.github.io/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <link rel="stylesheet" href="https://silviomoreto.github.io/bootstrap-select/dist/css/bootstrap-select.min.css">
+        <script src="https://silviomoreto.github.io/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
     </head>
     <body>
-    <script src="js/upload.js"></script>
-    <script src="js/recorder.js"></script>
-    <script src="js/index.js"></script>
     <nav class="navbar navbar-default">
         <div class="container">
             <div class="navbar-header">
@@ -35,9 +26,12 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                           aria-haspopup="true" aria-expanded="false">Language<span class="caret"></span></a>
+                        aria-haspopup="true" aria-expanded="false">
+                            <span data-translate="language"></span>
+                            <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#En" class="setLocale">English</a></li>
+                            <li><a href="#" id="en">English</a></li>
+                            <li><a href="#" id="be">Беларуская</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -52,64 +46,78 @@
                         <li id="tabExample" class="active">
                             <a data-toggle="tab" href="#exampleTab" class="active">
                                 <span class="glyphicon glyphicon-bullhorn"></span>
-                                Example                        </a>
+                                <span data-translate="example"></span>
+                            </a>
                         </li>
                         <li id="tabSpeakers">
                             <a data-toggle="tab" href="#speakersTab">
                                 <span class="glyphicon glyphicon-user"></span>
-                                Speakers                        </a>
+                                <span data-translate="speakers"></span>
+                            </a>
                         </li>
                         <li id="tabRecord">
                             <a data-toggle="tab" href="#recordTab">
                                 <span class="glyphicon glyphicon-record"></span>
-                                Record                        </a>
+                                <span data-translate="record"></span>
+                            </a>
                         </li>
                         <li id="tabUpload">
                             <a data-toggle="tab" href="#uploadtab">
                                 <span class="glyphicon glyphicon-upload"></span>
-                                Upload file                        </a>
+                                <span data-translate="upload"></span>
+                            </a>
                         </li>
                     </ul>
                     <div class="tab-content">
                         <div id="exampleTab" class="tab-pane fade  in active">
                             <div class="panel-body">
                                 <p>
-                                    <select class="form-control" name="testFiles" id="testFiles">
-                                    </select>
+                                    <select class="form-control" name="testFiles" id="testFiles"></select>
                                 </p>
-                                <p><audio id="player" controls="">
-                                    <source id="testSource" type="audio/wav" />
-                                    Your browser does not support the audio element.</audio></p>
-                                <p><button id="testBtn" class="btn btn-primary">Recognize</button></p>
+                                <p> <audio id="player" controls="">
+                                    <source id="testSource" type="audio/wav" data-translate="audio-unsupported"/>
+                                </audio></p>
+                                <p>
+                                    <select class="selectpicker" id="exampleSource"></select>
+                                    <button id="testBtn" class="btn btn-primary" data-translate="recognize">
+                                    </button></p>
                             </div>
                         </div>
-                        <div id="speakersTab" class="tab-pane fade row">
+                        <div id="speakersTab" class="tab-pane fade">
                             <div class="panel-body">
                                 <table class="table table-fixed">
                                     <thead>
-                                        <tr>
-                                            <th class="col-xs-2">Name</th>
-                                            <th class="col-xs-10">Example record</th>
-                                        </tr>
+                                    <tr>
+                                        <th class="col-xs-3" data-translate="name"></th>
+                                        <th class="col-xs-9" data-translate="example-record"></th>
+                                    </tr>
                                     </thead>
                                     <tbody id="speakerFiles">
                                     </tbody>
                                 </table>
+                                <select class="selectpicker" id="speakersSource"></select>
                             </div>
                         </div>
                         <div id="recordTab" class="tab-pane fade">
                             <div class="panel-body">
                                 <div id="recorder">
                                     <p>
-                                        <button id="record" type="button" class="btn btn-danger">Record</button>
-                                        <button id="stop" type="button" class="btn btn-info" >Stop</button>
+                                        <button id="record" type="button" class="btn btn-danger"
+                                                data-translate="record">
+                                        </button>
+                                        <button id="stop" type="button" class="btn btn-info"
+                                                data-translate="stop">
+                                        </button>
                                     </p>
                                     <p><audio id="recorderPlayer" controls="">
-                                        <source id="recorderSource" src="" type="audio/wav">
-                                        Your browser does not support the audio element.        </audio>
+                                        <source id="recorderSource" src="" type="audio/wav"
+                                                data-translate="audio-unsupported"></audio>
                                     </p>
                                     <p>
-                                        <button id="recognizeRecordedBtn" class="btn btn-primary">Recognize</button>
+                                        <select class="selectpicker" id="recordedSource"></select>
+                                        <button id="recognizeRecordedBtn" class="btn btn-primary"
+                                                data-translate="recognize">
+                                        </button>
                                     </p>
                                 </div>
                             </div>
@@ -119,19 +127,22 @@
                                 <form id="uploadForm" enctype="multipart/form-data" method="POST" >
                                     <div class="input-group">
                                         <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse &hellip; <input type="file"
-                                                                   name="data"
-                                                                   accept="audio/wav,audio/mp3,audio/aiff,audio/flac,audio/ogg"
-                                                                   style="display: none;">
-                                        </span>
+                                            <span class="btn btn-primary">
+                                                <span data-translate="browse"></span>
+                                                <input type="file" name="data"
+                                                    accept="audio/wav,audio/mp3,audio/aiff,audio/flac,audio/ogg"
+                                                    style="display: none;">
+                                            </span>
                                         </label>
                                         <input type="text" class="form-control" readonly>
                                     </div>
                                     <div>&nbsp;</div>
-                                    <div>Supported formats: wav, mp3, flac, ogg, aiff</div>
+                                    <div data-translate="supported-formats"></div>
                                     <div>&nbsp;</div>
-                                    <button id="uploadBtn" type="submit" class="btn btn-primary" disabled>Recognize</button>
+                                    <select class="selectpicker" id="uploadedSource"></select>
+                                    <button id="uploadBtn" type="submit" class="btn btn-primary"
+                                            data-translate="recognize" disabled>
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -142,12 +153,12 @@
                 <div class="control-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Recognized speaker<files></files></h3>
+                            <h3 class="panel-title" id="outputPanel" data-translate="recognized-speaker"></h3>
                         </div>
                         <div class="panel-body">
                             <p>
-                                <textarea class="form-control" rows="5" id="outputText" placeholder="Recognized speaker"
-                                         readonly=""></textarea>
+                                    <textarea class="form-control" rows="5" id="outputText"
+                                            readonly=""></textarea>
                             </p>
                         </div>
                     </div>
@@ -157,8 +168,14 @@
     </div>
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">Speaker recognition powered by <a href="http://kaldi-asr.org/">Kaldi</a></p>
+            <p class="text-muted"><span data-translate="powered-by"></span><a href="http://kaldi-asr.org/">Kaldi</a></p>
         </div>
     </footer>
+    <script src="js/scope.js"></script>
+    <script src="js/upload.js"></script>
+    <script src="js/recorder.js"></script>
+    <script src="js/record.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/translate.js"></script>
     </body>
 </html>

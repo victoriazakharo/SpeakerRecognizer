@@ -16,7 +16,7 @@ if [ $# -lt 4 ] || [ $# -gt 5 ]; then
   exit 1
 fi
 if [[ "$1" = "--help" || "$1" = "-h" ]]; then 
-  echo "$usage"
+  echo "${usage}"
   exit 0
 fi 
 

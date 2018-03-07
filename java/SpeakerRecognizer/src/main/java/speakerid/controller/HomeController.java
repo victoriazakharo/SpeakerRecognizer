@@ -12,9 +12,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,10 +24,11 @@ import java.util.stream.Stream;
 
 @Controller
 public class HomeController {
-    private Map<Integer, String> speakers = new HashMap<>();
+    private Map<String, Map<Integer, String>> speakers = new HashMap<>();
     private static Socket clientSocket;
     private static BufferedReader input;
     private static DataOutputStream output;
+
 
     private static final String HOST = "logic";
     private static final int PORT = 1024;
@@ -35,20 +38,6 @@ public class HomeController {
 
     @Value("${speakers.filename}")
     private String speakersFilename;
-
-    private void loadSpeakers() {
-        try (Stream<String> stream = Files.lines(Paths.get(speakersDirectory + speakersFilename))) {
-            stream.forEach(
-                    line -> {
-                        String[] words = line.split(" ");
-                        speakers.putIfAbsent(Integer.valueOf(words[0]), words[1]);
-                    }
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.printf("Loaded %d speakers\n", speakers.size());
-    }
 
     @PostConstruct
     public void init() {
@@ -86,8 +75,9 @@ public class HomeController {
 
     @RequestMapping(value = "/getTestRecords", method = RequestMethod.GET)
     @ResponseBody
-    public String[] getTestRecords() {
-        File testFolder = new File(speakersDirectory + "audio/test");
+    public String[] getTestRecords(@RequestParam String source) {
+        String foldername = speakersDirectory + source + "/audio/test";
+        File testFolder = new File(foldername);
         File[] records = testFolder.listFiles();
         String[] fileNames = new String[records.length];
         for (int i = 0; i < records.length; i++) {
@@ -96,33 +86,40 @@ public class HomeController {
         return fileNames;
     }
 
+    @RequestMapping(value = "/getSources", method = RequestMethod.GET)
+    @ResponseBody
+    public String[] getSources() {
+        File[] dirs = new File(speakersDirectory).listFiles(File::isDirectory);
+        return Arrays.stream(dirs).map(d -> d.getName()).toArray(String[]::new);
+    }
+
     @RequestMapping(value = "/getSpeakerRecords", method = RequestMethod.GET)
     @ResponseBody
-    public String[][] getSpeakerRecords() {
-        File testFolder = new File(speakersDirectory + "audio/example");
+    public String[][] getSpeakerRecords(@RequestParam String source) {
+        String foldername = speakersDirectory + source + "/audio/example";
+        File testFolder = new File(foldername);
         File[] records = testFolder.listFiles();
         String[][] result = new String[records.length][2];
         String extensionRegex = "[.][^.]+$";
         for (int i = 0; i < records.length; i++) {
             String filename = records[i].getName();
             String speaker = filename.replaceFirst(extensionRegex, "");
-            String[] record = new String[2];
-            record[0] = filename;
-            record[1] = speakers.get(Integer.valueOf(speaker));
-            result[i] = record;
+            result[i] = new String[2];
+            result[i][0] = filename;
+            result[i][1] = speakers.get(source).get(Integer.valueOf(speaker));
         }
         return result;
     }
 
     @RequestMapping(value = "/recognize", method = RequestMethod.GET)
     @ResponseBody
-    public String recognize(@RequestParam String path) {
+    public String recognize(@RequestParam String source, @RequestParam String path) {
         String result = "not found";
         try {
-            output.writeBytes(speakersDirectory + path + "\n");
+            output.writeBytes(String.format("%s %s%s\n", source, speakersDirectory, path));
             int speaker = Integer.valueOf(input.readLine());
-            result = speakers.get(speaker);
-        } catch (IOException e) {
+            result = speakers.get(source).get(speaker);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
@@ -130,20 +127,53 @@ public class HomeController {
 
     @RequestMapping(value = "/recognizeUploaded", method = RequestMethod.POST)
     @ResponseBody
-    public String recognizeRecorded(@RequestParam("data") MultipartFile multipartFile) {
+    public String recognizeRecorded(@RequestParam("source") String source,
+                                    @RequestParam("data") MultipartFile multipartFile) {
         String time = new SimpleDateFormat("HH-mm-ss.SSS").format(new Date());
         String path = String.format("%s%d_%s.wav", speakersDirectory, Thread.currentThread().getId(), time);
         String result = null;
         try {
             File uploadedFile = new File(path);
             multipartFile.transferTo(uploadedFile);
-            output.writeBytes(path + "\n");
-            int speaker = Integer.valueOf(input.readLine());
-            result = speakers.get(speaker);
+            path = preprocess(path);
             uploadedFile.delete();
+            output.writeBytes(String.format("%s %s\n", source, path));
+            int speaker = Integer.valueOf(input.readLine());
+            result = speakers.get(source).get(speaker);
+            new File(path).delete();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+    private void loadSpeakers() {
+        File[] dirs = new File(speakersDirectory).listFiles(File::isDirectory);
+        for(File dir : dirs) {
+            Map<Integer, String> map = new HashMap<>();
+            String source = dir.getName();
+            String path = speakersDirectory + source + "/" + speakersFilename;
+            try (Stream<String> stream = Files.lines(Paths.get(path), Charset.forName("UTF-16"))) {
+                stream.forEach(
+                        line -> {
+                            String[] words = line.split(" ");
+                            map.putIfAbsent(Integer.valueOf(words[0]), words[1]);
+                        }
+                );
+                speakers.put(source, map);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.printf("Loaded %d speakers from %s\n", map.size(), source);
+        }
+    }
+
+    private String preprocess(String path) throws IOException, InterruptedException {
+        String extensionRegex = "[.][^.]+$";
+        String newPath = path.replaceFirst(extensionRegex, "-16k.wav");
+        String cmd = String.format("sox %s -c 1 -r 16000 %s", path, newPath);
+        Process process = Runtime.getRuntime().exec(cmd);
+        process.waitFor();
+        return newPath;
     }
 }

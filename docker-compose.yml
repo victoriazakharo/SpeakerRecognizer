@@ -7,7 +7,7 @@ services:
      - "1024:1024"
     volumes:
      - ./temp/:/temp  
-    command: /temp/models/ model.txt
+    command: /temp/
     tty: true    
   web:
     build: ./java

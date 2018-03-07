@@ -1,10 +1,17 @@
 #include "inverse_mfcc.h"
-#include <math.h>
 
 InverseMfcc::InverseMfcc() : Mfcc() {
 }
 
+void InverseMfcc::InitFilterBanks() {
+	const double lowFreq = sampleFreq / NFFT;
+	f2 = sampleFreq / 2 + lowFreq;
+	f1 = Mfcc::MelScale(maxFreq) + Mfcc::MelScale(lowFreq);
+	Mfcc::InitFilterBanks();
+}
+
+
 double InverseMfcc::MelScale(double freq) const {
-	return 2195.286 - 2595 * log(1.0 + (8062.5 - freq) / 700.0);
+	return f1 - Mfcc::MelScale(f2 - freq);
 }
 

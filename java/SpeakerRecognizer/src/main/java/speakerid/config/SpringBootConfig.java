@@ -10,6 +10,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 @SpringBootApplication
 @ComponentScan(basePackages = "speakerid")
 public class SpringBootConfig extends SpringBootServletInitializer {
@@ -27,8 +31,13 @@ public class SpringBootConfig extends SpringBootServletInitializer {
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
-                String audioPath = "file:" + speakersDirectory + "audio/";
-                registry.addResourceHandler("/audio/**").addResourceLocations(audioPath);
+                File[] dirs = new File(speakersDirectory).listFiles(File::isDirectory);
+                for(File dir : dirs){
+                    String source = dir.getName();
+                    String audioPath = "file:" + speakersDirectory + source + "/";
+                    String pattern = "/"+ source +"/**";
+                    registry.addResourceHandler(pattern).addResourceLocations(audioPath);
+                }
             }
         };
     }
