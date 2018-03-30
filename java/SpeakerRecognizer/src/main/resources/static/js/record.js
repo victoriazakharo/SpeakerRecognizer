@@ -11,6 +11,13 @@ function onGetUserMedia(stream) {
     recorder.record();
 }
 
+function setTextToRead(source){
+    var text = source.startsWith("be_") ?
+        "У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі." :
+        "The quick brown fox jumps over the lazy dog.";
+    $("#textToRead").text(text);
+}
+
 $(function() {
     recognizeRecordedBtn.prop('disabled', true);
     stopBtn.prop('disabled', true);

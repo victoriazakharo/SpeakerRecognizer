@@ -8,7 +8,7 @@
 using namespace std;
 
 void recognize_batch(int argc, char* argv[]) {
-	if (argc != 6 && argc != 7) {
+	if (argc != 7 && argc != 8) {
 		printf("Usage: %s <result-file> <model-folder> <model-file> "
 			"<expected-result-file> <record-folder> <use-imfcc>"
 			" [<kaldi-feature-file>]\n", argv[0]);
@@ -44,13 +44,14 @@ void recognize_online(int argc, char* argv[]) {
 	const string base_folder(argv[1]);
 	const string model_file = "model.txt";
 	const string model_folder = "/models/";
+	const string english_prefix = "en_";
 
 	// TODO: config sources
-	vector<string> sources{ "Timit", "LibriSpeech", "Belorussian" };
+	vector<string> sources{ "en_Timit", "en_LibriSpeech", "be_BelarusianSpeech" };
 	map<string, SpeakerRecognizer> recognizers;
 	for(auto & source : sources) {
 		const string model_path = base_folder + source + model_folder;
-		const bool use_imfcc = source != "Belorussian";
+		const bool use_imfcc = !source.compare(0, english_prefix.size(), english_prefix);
 		recognizers.emplace(source, SpeakerRecognizer(model_path, model_file, use_imfcc));
 	}
 
@@ -69,7 +70,6 @@ void recognize_online(int argc, char* argv[]) {
 				string file = message.substr(space_ix + 1);
 				auto it = recognizers.find(source);
 				// TODO: handle not found case
-				//const int dictor = it != recognizers.end() ? it->second->Test(file) : -1;
 				const int dictor = it != recognizers.end() ? it->second.Test(file) : -1;
 				string answer = to_string(dictor) + "\n";
 				message.clear();
