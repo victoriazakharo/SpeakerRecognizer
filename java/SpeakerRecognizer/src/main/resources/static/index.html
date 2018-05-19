@@ -40,7 +40,7 @@
     </nav>
     <div class="container theme-showcase" role="main">
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-9">
                 <div class="panel panel-default">
                     <ul class="nav nav-tabs">
                         <li id="tabExample" class="active">
@@ -67,6 +67,12 @@
                                 <span data-translate="upload"></span>
                             </a>
                         </li>
+                        <li id="tabEnroll">
+                            <a data-toggle="tab" href="#enrollTab">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <span data-translate="add-yourself"></span>
+                            </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="exampleTab" class="tab-pane fade  in active">
@@ -74,8 +80,8 @@
                                 <p>
                                     <select class="form-control" name="testFiles" id="testFiles"></select>
                                 </p>
-                                <p> <audio id="player" controls="">
-                                    <source id="testSource" type="audio/wav" data-translate="audio-unsupported"/>
+                                <p> <audio id="exampleAudio" controls="">
+                                    <source id="exampleAudioSource" type="audio/wav" data-translate="audio-unsupported"/>
                                 </audio></p>
                                 <p>
                                     <select class="selectpicker" id="exampleSource"></select>
@@ -100,24 +106,24 @@
                         </div>
                         <div id="recordTab" class="tab-pane fade">
                             <div class="panel-body">
-                                <div id="recorder">
+                                <div >
                                     <p>
                                     <p data-translate="read-text"></p>
-                                    <p><i id="textToRead"></i></p>
-                                        <button id="record" type="button" class="btn btn-danger"
+                                    <p><i id="textToRecognize"></i></p>
+                                        <button id="recordTabRecord" class="btn btn-danger"
                                                 data-translate="record">
                                         </button>
-                                        <button id="stop" type="button" class="btn btn-info"
+                                        <button id="recordTabStop" class="btn btn-info"
                                                 data-translate="stop">
                                         </button>
                                     </p>
-                                    <p><audio id="recorderPlayer" controls="">
-                                        <source id="recorderSource" src="" type="audio/wav"
+                                    <p><audio id="recordAudio" controls="">
+                                        <source id="recordAudioSource" src="" type="audio/wav"
                                                 data-translate="audio-unsupported"></audio>
                                     </p>
                                     <p>
-                                        <select class="selectpicker" id="recordedSource"
-                                                onchange="setTextToRead(this.value)"></select>
+                                        <select class="selectpicker" id="recordSource"
+                                                onchange="setTextToRecognize(this.value)"></select>
                                         <button id="recognizeRecordedBtn" class="btn btn-primary"
                                                 data-translate="recognize">
                                         </button>
@@ -149,10 +155,27 @@
                                 </form>
                             </div>
                         </div>
+                        <div id="enrollTab" class="tab-pane fade">
+                            <div class="panel-body">
+                                <div >
+                                    <p>
+                                        <p data-translate="read-text"></p>
+                                        <p><div id="textToEnroll"></div></p>
+                                    </p>
+                                    <p>
+                                        <select class="selectpicker" id="enrollSource"
+                                                onchange="setTextToEnroll(this.value)"></select>
+                                        <button id="enrollBtn" class="btn btn-primary" disabled
+                                                data-translate="add-yourself">
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <div class="control-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -160,8 +183,7 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                    <textarea class="form-control" rows="5" id="outputText"
-                                            readonly=""></textarea>
+                                <textarea class="form-control" rows="5" id="outputText" readonly=""></textarea>
                             </p>
                         </div>
                     </div>
@@ -179,6 +201,7 @@
     <script src="js/recorder.js"></script>
     <script src="js/record.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/enroll.js"></script>
     <script src="js/translate.js"></script>
     </body>
 </html>

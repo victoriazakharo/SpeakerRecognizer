@@ -1,24 +1,24 @@
 $(function() {
-    function translate(lang){
-        $.getJSON('messages.json', function(data) {
-            var messages = data[lang];
-            $("[data-translate]").each(function(ix, value) {
-                var key = value.getAttribute("data-translate");
-                value.innerHTML = messages[key];
-            });
-            waiter.waitMessage = messages["waiting"];
+    function translate(){
+        var messages = messageJson[lang];
+        $("[data-translate]").each(function(ix, value) {
+            var key = value.getAttribute("data-translate");
+            value.innerHTML = messages[key];
         });
+        waiter.waitMessage = messages["waiting"];
+        outputText.prop('placeholder', messages["recognized-speaker"]);
     }
-
-    translate("en");
+    $.getJSON('messages.json', function(data) {
+        messageJson = data;
+        translate();
+    });
     $("#en").click(function() {
-        translate("en");
+        lang = "en";
+        translate();
     });
     $("#be").click(function() {
-        translate("be");
-    });
-    $('#outputPanel').on("DOMSubtreeModified", function(){
-        $('#outputText').prop('placeholder', $('#outputPanel').text());
+        lang = "be";
+        translate();
     });
 });
 

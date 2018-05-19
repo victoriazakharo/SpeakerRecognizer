@@ -3,30 +3,23 @@
 function fillTest(source) {
     var testFileSelect = $('#testFiles');
     testFileSelect.empty();
-    $.ajax({
-        type: "GET",
-        url: "getTestRecords",
-        data: { "source": source },
-        success: function (data) {
+    $.get("getTestRecords", { "source": source },
+        function (data) {
             for (var i = 0; i < data.length; i++) {
                 testFileSelect.append($('<option>', { value: data[i] }).text(data[i]));
             }
             if (data.length > 0) {
-                $('#testSource').attr("src", source + "/audio/test/" + data[0]);
-                player.load();
+                exampleAudioSource.attr("src", source + "/audio/test/" + data[0]);
+                exampleAudio.load();
             }
-        }
-    });
+        });
 }
 
 function fillSpeakers(source){
     var speakers = $("#speakerFiles");
     speakers.empty();
-    $.ajax({
-        type: "GET",
-        url: "getSpeakerRecords",
-        data: { "source": source },
-        success: function (data) {
+    $.get("getSpeakerRecords", { "source": source },
+        function (data) {
             for (var i = 0; i < data.length; i++) {
                 var audio = $("<audio>");
                 audio.attr({
@@ -39,7 +32,25 @@ function fillSpeakers(source){
                 row.append(name).append(record);
                 speakers.append(row);
             }
-        }
+        });
+}
+
+function setRecognizedSpeakerPanel(){
+    outputText.html('');
+    outputText.removeAttr('data-translate');
+    outputPanel.text(messageJson[lang]["recognized-speaker"]);
+    outputPanel.attr('data-translate', "recognized-speaker");
+}
+
+function initTabs(){
+    $("#tabExample").click(setRecognizedSpeakerPanel);
+    $("#tabRecord").click(setRecognizedSpeakerPanel);
+    $("#tabUpload").click(setRecognizedSpeakerPanel);
+    $("#tabEnroll").click(function(){
+        outputPanel.text(messageJson[lang]["status"]);
+        outputPanel.attr('data-translate', "status");
+        outputText.html(messageJson[lang]["not-enrolled"]);
+        outputText.attr('data-translate', "not-enrolled");
     });
 }
 
@@ -50,14 +61,13 @@ $(function() {
     speakersSource.change(function () {
         fillSpeakers(this.value);
     });
-    $.ajax({
-        type: "GET",
-        url: "getSources",
-        success: function (data) {
+    initTabs();
+    $.get("getSources", function (data) {
             var sources = [
                 exampleSource,
-                uploadedSource,
-                recordedSource,
+                uploadSource,
+                recordSource,
+                enrollSource,
                 speakersSource
             ];
             for(var j = 0; j < sources.length; j++){
@@ -68,30 +78,24 @@ $(function() {
                 sources[j].selectpicker("refresh");
                 sources[j].trigger("change");
             }
-        }
-    });
+        });
     $('#testFiles').change(function(e) {
         e.preventDefault();
         var source = exampleSource.find(":selected").val();
-        $('#testSource').attr("src", source + "/audio/test/" + this.value);
-        player.pause();
-        player.load();
+        exampleAudioSource.attr("src", source + "/audio/test/" + this.value);
+        exampleAudio.pause();
+        exampleAudio.load();
     });
 
     testBtn.click(function (e) {
         e.preventDefault();
         var source = exampleSource.find(":selected").val();
         waiter.start();
-        var src = $('#testSource').attr("src");
-        $.ajax({
-            type: "GET",
-            url: "recognize",
-            data: { "source": source, "path": src },
-            success: function (data) {
-                outputText.val(data);
+        var src = exampleAudioSource.attr("src");
+        $.get("recognize", { "source": source, "path": src }, function (data) {
+                outputText.html(data);
                 waiter.stop();
-            }
-        });
+            });
     });
     navigator.mediaDevices.getUserMedia = (navigator.mediaDevices.getUserMedia ||
         navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);

@@ -6,7 +6,7 @@ services:
     ports: 
      - "1024:1024"
     volumes:
-     - ./temp/:/temp  
+     - ./temp/:/temp
     command: /temp/
     tty: true    
   web:
@@ -15,6 +15,7 @@ services:
     ports: 
      - "8089:8080"
     volumes:
-     - ./temp/:/temp     
+     - ./temp/:/temp
+     - ./kaldi/:/kaldi
     environment: 
      - speakers.directory=/temp/

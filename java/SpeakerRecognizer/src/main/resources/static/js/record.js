@@ -11,58 +11,63 @@ function onGetUserMedia(stream) {
     recorder.record();
 }
 
-function setTextToRead(source){
+function startRecord(){
+    navigator.getUserMedia(
+        {audio: true},
+        onGetUserMedia,
+        function () {
+            console.warn("Error getting audio stream from getUserMedia");
+        });
+}
+
+function stopRecord() {
+    if(recorder){
+        recorder.stop();
+    }
+    localStream.getTracks()[0].stop();
+    context.disabled = true;
+    context.close();
+}
+
+function setTextToRecognize(source){
     var text = source.startsWith("be_") ?
         "У рудога вераб’я ў сховішчы пад фатэлем ляжаць нейкія гаючыя зёлкі." :
         "The quick brown fox jumps over the lazy dog.";
-    $("#textToRead").text(text);
+    $("#textToRecognize").text(text);
 }
 
-$(function() {
-    recognizeRecordedBtn.prop('disabled', true);
-    stopBtn.prop('disabled', true);
+function bindRecordButtons(recordBtn, stopBtn, source, audio, actionBtn){
+    actionBtn.prop('disabled', true);
     stopBtn.hide();
-
     recordBtn.click(function() {
-        navigator.getUserMedia(
-            {audio: true},
-            onGetUserMedia,
-            function () {
-                console.warn("Error getting audio stream from getUserMedia");
-            });
-        recognizeRecordedBtn.prop('disabled', true);
-        recordBtn.prop('disabled', true);
-        stopBtn.prop('disabled', false);
+        startRecord();
+        actionBtn.prop('disabled', true);
         recordBtn.hide();
         stopBtn.show();
     });
-
     stopBtn.click(function() {
-        recordBtn.prop('disabled', false);
-        recognizeRecordedBtn.prop('disabled', false);
-        stopBtn.prop('disabled', true);
+        actionBtn.prop('disabled', false);
         recordBtn.show();
         stopBtn.hide();
-
         if(recorder){
             recorder.exportWAV(function(blob) {
                 var url = URL.createObjectURL(blob);
-                $('#recorderSource').attr("src", url);
-                var player = $('#recorderPlayer');
-                player[0].pause();
-                player[0].load();
+                source.attr("src", url);
+                audio[0].pause();
+                audio[0].load();
             });
-            recorder.stop();
         }
-        localStream.getTracks()[0].stop();
-        context.disabled = true;
-        context.close();
+        stopRecord();
     });
+}
 
+$(function() {
+    bindRecordButtons($("#recordTabRecord"), $("#recordTabStop"),
+        $("#recordAudioSource"), $("#recordAudio"), recognizeRecordedBtn);
     recognizeRecordedBtn.click(function(e) {
         e.preventDefault();
         waiter.start();
-        var source = recordedSource.find(":selected").val();
+        var source = recordSource.find(":selected").val();
         recorder && recorder.exportWAV(function(blob) {
             var fd = new FormData();
             fd.set("data", blob, "uploaded.wav");
@@ -75,7 +80,7 @@ $(function() {
                 contentType: false,
                 cache: false,
             }).done(function(data) {
-                outputText.val(data);
+                outputText.html(data);
                 waiter.stop();
             });
         });
