@@ -23,7 +23,7 @@ $(function() {
         });
         uploadForm.submit(function(e) {
             waiter.start();
-            var source = uploadedSource.find(":selected").val();
+            var source = uploadSource.find(":selected").val();
             e.preventDefault();
             var fd = new FormData(uploadForm[0]);
             fd.set("source", source);
@@ -35,7 +35,7 @@ $(function() {
                 contentType: false,
                 cache: false,
             }).done(function(data) {
-                outputText.val(data);
+                outputText.html(data);
                 waiter.stop();
             });
         });

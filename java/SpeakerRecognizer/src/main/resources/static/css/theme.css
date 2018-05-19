@@ -93,3 +93,7 @@ code {
     float: left;
     border-width: 0;
 }
+.text-fragment {
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+}
