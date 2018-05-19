@@ -161,11 +161,11 @@ public class HomeController {
         Files.write(wavscp, String.format("%s %s", recordId, relativeName).getBytes());
 
         Process process = new ProcessBuilder("/kaldi/process.sh",
-                "/kaldi", speakersDirectory + source, userId, recordId).start();
-        process.waitFor();
+                "/kaldi", speakersDirectory + source, userId, recordId).inheritIO().start();
+        int result = process.waitFor();
         uploadedFile.delete();
         recordFile.delete();
-        return "accepted"; // TODO: add diagnostic
+        return result == 0 ? "accepted" : "failed";
     }
 
     @RequestMapping(value = "/getSpeakerRecords", method = RequestMethod.GET)
@@ -265,9 +265,8 @@ public class HomeController {
     private String preprocess(String path) throws IOException, InterruptedException {
         String extensionRegex = "[.][^.]+$";
         String newPath = path.replaceFirst(extensionRegex, "-16k.wav");
-        String cmd = "cp /kaldi/1.wav " + newPath;
-        System.out.println(cmd); //TODO: remove
-        //String cmd = String.format("sox %s -c 1 -r 16000 %s silence 1 0.5 0.03%% -1 0.5 0.03%%", path, newPath);
+        //String cmd = "cp /kaldi/1.wav " + newPath;
+        String cmd = String.format("sox %s -c 1 -r 16000 %s silence 1 0.5 0.03%% -1 0.5 0.03%%", path, newPath);
         Process process = Runtime.getRuntime().exec(cmd);
         process.waitFor();
         return newPath;
