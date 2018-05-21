@@ -24,7 +24,9 @@ function stopRecord() {
     if(recorder){
         recorder.stop();
     }
-    localStream.getTracks()[0].stop();
+    if(localStream){
+        localStream.getTracks()[0].stop();
+    }
     context.disabled = true;
     context.close();
 }

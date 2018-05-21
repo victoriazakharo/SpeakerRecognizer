@@ -13,23 +13,6 @@
 
 using namespace arma;
 
-void ReadRecordPaths(map<int, string>& files, const string& file_path) {
-	string line, path;
-	int id;
-	std::ifstream fi(file_path);
-	if (fi.is_open()) {
-		while (getline(fi, line)) {
-			std::stringstream stream(line);
-			stream >> id >> path;
-			files[id] = path;
-		}
-	}
-	else {
-		fprintf(stderr, "Cannot open file %s\n", file_path.c_str());
-	}
-	fi.close();
-}
-
 void SpeakerModeler::BuildDictorModels(const map<int, map<int, vector<vector<double>>>>& features) const {
 	map<int, map<int, gmm_diag>> models;
 	for (auto& kv : features) {
@@ -47,10 +30,7 @@ void SpeakerModeler::BuildDictorModels(const map<int, map<int, vector<vector<dou
 }
 
 void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignment_path, 
-	map<int, map<int, vector<vector<double>>>>& features, const string& file_path) {
-
-	map<int, string> files;
-	ReadRecordPaths(files, file_path);
+	map<int, map<int, vector<vector<double>>>>& features, map<int, string>& files) {
 	string line;
 	int phoneme, record, dictor, prev_record = -1;
 	int window_size_in_samples, hop_in_samples, sampling_rate, offset;

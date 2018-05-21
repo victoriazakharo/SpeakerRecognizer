@@ -21,9 +21,9 @@ class SpeakerModeler {
 public:
 	SpeakerModeler(const string& model_folder, const string& model_file,
 		bool use_imfcc = true);
-	void BuildDictorModels(const map<int, map<int, vector<vector<double>>>>& features) const;
+	void BuildDictorModels(const map<int, map<int, vector<vector<double>>>>& features) const;	
 	void ExtractFeatures(const string& folder, const string& alignment_path,
-	                     map<int, map<int, vector<vector<double>>>>& features, const string& file_path);
+		map<int, map<int, vector<vector<double>>>>& features, map<int, string>& files);
 	void ReadFeatures(const string& alignment_path, map<int, map<int, vector<vector<double>>>>& features,
 	                  const string& feature_path, const string& record_map_path);
 };

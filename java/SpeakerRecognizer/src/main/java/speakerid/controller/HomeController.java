@@ -1,5 +1,6 @@
 package speakerid.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,20 +9,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
+import speakerid.util.Cleanup;
+import speakerid.util.RecordPreprocessor;
+import speakerid.util.ResourceLoader;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 @Controller
 public class HomeController {
@@ -33,8 +33,9 @@ public class HomeController {
 
     private static final String HOST = "logic";
     private static final int PORT = 1024;
-    private static long SessionTimeoutSeconds = 1800;
-    private static final long CleanupTimeoutMilliseconds = 60000;
+
+    @Autowired private ResourceLoader loader;
+    @Autowired private Cleanup cleanup;
 
     @Value("${speakers.directory}")
     private String speakersDirectory;
@@ -44,7 +45,7 @@ public class HomeController {
 
     @PostConstruct
     public void init() {
-        loadSpeakersAndTexts();
+        loader.load(speakers, texts);
         try {
             while (true) {
                 try {
@@ -60,7 +61,7 @@ public class HomeController {
             }
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new DataOutputStream(clientSocket.getOutputStream());
-            startCleanup();
+            cleanup.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,8 +73,7 @@ public class HomeController {
             input.close();
             output.close();
             clientSocket.close();
-            SessionTimeoutSeconds = 0;
-            cleanupUserData();
+            cleanup.finalCleanup();
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -101,20 +101,21 @@ public class HomeController {
     @RequestMapping(value = "/getSources", method = RequestMethod.GET)
     @ResponseBody
     public String[] getSources() {
-        File[] dirs = new File(speakersDirectory).listFiles(File::isDirectory);
-        return Arrays.stream(dirs).map(d -> d.getName()).toArray(String[]::new);
+        return loader.getSources();
     }
 
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, List<String>> getUserInfo() {
         String id = RequestContextHolder.currentRequestAttributes().getSessionId();
-        String[] sources = getSources();
+        String[] sources = loader.getSources();
         Map<String, List<String>> enrolledRecords = new HashMap<>();
         for(String source : sources){
-            File directory = new File(String.format("%s%s/data/%s", speakersDirectory, source, id));
+            String userDir = String.format("%s%s/data/%s", speakersDirectory, source, id);
+            File directory = new File(userDir);
             if (!directory.exists()) {
                 directory.mkdir();
+                new File(userDir + "/models").mkdir();
             }
             File[] records = directory.listFiles();
             List<String> recordNames = new ArrayList<>();
@@ -138,7 +139,7 @@ public class HomeController {
         String recordPath = userDataDir + name;
         File uploadedFile = new File(recordPath);
         multipartFile.transferTo(uploadedFile);
-        recordPath = preprocess(recordPath);
+        recordPath = RecordPreprocessor.preprocess(recordPath);
         File recordFile = new File(recordPath);
 
         String extensionRegex = "[.][^.]+$";
@@ -164,7 +165,6 @@ public class HomeController {
                 "/kaldi", speakersDirectory + source, userId, recordId).inheritIO().start();
         int result = process.waitFor();
         uploadedFile.delete();
-        recordFile.delete();
         return result == 0 ? "accepted" : "failed";
     }
 
@@ -210,7 +210,7 @@ public class HomeController {
         try {
             File uploadedFile = new File(path);
             multipartFile.transferTo(uploadedFile);
-            path = preprocess(path);
+            path = RecordPreprocessor.preprocess(path);
             uploadedFile.delete();
             output.writeBytes(String.format("%s %s\n", source, path));
             int speaker = Integer.valueOf(input.readLine());
@@ -220,90 +220,5 @@ public class HomeController {
             e.printStackTrace();
         }
         return result;
-    }
-
-    private void loadSpeakersAndTexts() {
-        File speakersDir = new File(speakersDirectory);
-        File[] dirs = speakersDir.listFiles(File::isDirectory);
-        for(File dir : dirs) {
-            String source = dir.getName();
-            loadTexts(source);
-            Map<Integer, String> map = new HashMap<>();
-            String path = String.format("%s%s/%s",speakersDirectory, source, speakersFilename);
-            try (Stream<String> stream = Files.lines(Paths.get(path), Charset.forName("UTF-16"))) {
-                stream.forEach(
-                        line -> {
-                            String[] words = line.split(" ");
-                            map.putIfAbsent(Integer.valueOf(words[0]), words[1]);
-                        }
-                );
-                speakers.put(source, map);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.printf("Loaded %d speakers from %s\n", map.size(), source);
-        }
-    }
-
-    private void loadTexts(String source){
-        String sourceLang = source.split("_")[0];
-        if(!texts.containsKey(sourceLang)) {
-            List<String> lines = new ArrayList<>();
-            File file = new File(String.format("%s%s/texts",speakersDirectory, source));
-            try (Scanner scanner = new Scanner(file, "UTF-8")) {
-                while(scanner.hasNextLine()){
-                    lines.add(scanner.nextLine());
-                }
-                scanner.close();
-                texts.put(sourceLang, lines);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private String preprocess(String path) throws IOException, InterruptedException {
-        String extensionRegex = "[.][^.]+$";
-        String newPath = path.replaceFirst(extensionRegex, "-16k.wav");
-        //String cmd = "cp /kaldi/1.wav " + newPath;
-        String cmd = String.format("sox %s -c 1 -r 16000 %s silence 1 0.5 0.03%% -1 0.5 0.03%%", path, newPath);
-        Process process = Runtime.getRuntime().exec(cmd);
-        process.waitFor();
-        return newPath;
-    }
-
-    private void startCleanup(){
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    cleanupUserData();
-                } catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-        }, 0, CleanupTimeoutMilliseconds);
-    }
-
-    private void cleanupUserData() throws IOException {
-        String[] sources = getSources();
-        String[] userDirs = new String[]{"data", "exp", "mfcc"};
-        for(String source : sources){
-            for(String dir : userDirs){
-                String path = String.format("%s%s/%s", speakersDirectory, source, dir);
-                File[] dirs = new File(path).listFiles(File::isDirectory);
-                for(File directory : dirs) {
-                    if(directory.getName() != "lang"){
-                        BasicFileAttributes attr = Files.readAttributes(directory.toPath(), BasicFileAttributes.class);
-                        long created = attr.creationTime().to(TimeUnit.SECONDS);
-                        long now = new Date().getTime() / 1000;
-                        if(now - created > SessionTimeoutSeconds){
-                            directory.delete();
-                        }
-                    }
-                }
-            }
-        }
     }
 }

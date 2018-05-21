@@ -4,5 +4,10 @@
 #include <map>
 #include <armadillo>
 
-void WriteModel(const std::string& folder, const std::string& file_name,
-	std::map<int, std::map<int, arma::gmm_diag>>& data);
+using std::map;
+using std::string;
+
+void WriteModel(const string& folder, const string& file_name,
+	map<int, map<int, arma::gmm_diag>>& data);
+
+void ReadRecordPaths(map<int, string>& files, const string& file_path);

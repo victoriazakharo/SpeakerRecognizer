@@ -32,3 +32,20 @@ void WriteModel(const string& folder, const string& file_name, std::map<int, std
 	out << "\n";
 	out.close();
 }
+
+void ReadRecordPaths(map<int, string>& files, const string& file_path) {
+	string line, path;
+	int id;
+	std::ifstream fi(file_path);
+	if (fi.is_open()) {
+		while (getline(fi, line)) {
+			std::stringstream stream(line);
+			stream >> id >> path;
+			files[id] = path;
+		}
+	}
+	else {
+		fprintf(stderr, "Cannot open file %s\n", file_path.c_str());
+	}
+	fi.close();
+}

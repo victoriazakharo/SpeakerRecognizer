@@ -68,10 +68,21 @@ void recognize_online(int argc, char* argv[]) {
 				size_t space_ix = message.find(' ');
 				string source = message.substr(0, space_ix);
 				string file = message.substr(space_ix + 1);
-				auto it = recognizers.find(source);
-				// TODO: handle not found case
-				const int dictor = it != recognizers.end() ? it->second.Test(file) : -1;
-				string answer = to_string(dictor) + "\n";
+				space_ix = file.find(' ');
+				string answer;
+				if (space_ix == string::npos) {
+					auto it = recognizers.find(source);
+					// TODO: handle not found case
+					const int dictor = it != recognizers.end() ? it->second.Test(file) : -1;
+					answer = to_string(dictor) + "\n"; 
+				} else {
+					string module_name(argv[0]);
+					string modeler_name = "SpeakerRecognizer";
+					int ix = module_name.rfind(modeler_name);
+					string cmd = module_name.replace(ix, modeler_name.size(), "SpeakerModeler") + " " + file;
+					system(cmd.c_str());
+					answer = "ok\n";
+				}
 				message.clear();
 				if (send(socket, &answer[0], answer.size(), 0) < 0) {
 					handle_socket_error(socket);

@@ -33,9 +33,9 @@ function setTextToEnroll(source){
             let failButton = $("<button>").addClass("btn btn-danger")
                 .append($("<span>").addClass("glyphicon glyphicon-remove"));
             let recordId = i + "";
+            failButton.hide();
             if(enrolledRecords[source].indexOf(recordId) < 0){
                 okButton.hide();
-                failButton.hide();
             }
             let processButton = $("<button>")
                 .addClass("btn btn-warning process-button").attr("id", recordId)

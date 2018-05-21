@@ -38,7 +38,7 @@ ${steps}/align_fmllr.sh --nj 1 --cmd "$train_cmd" $x data/lang exp/tri4a ${ali}
 if [ $? -eq 0 ]
 then
   ${src}/bin/ali-to-phones --ctm-output exp/tri4a/final.mdl ark:"gunzip -c ${ali}/ali.1.gz|" -> ${ali}/ali.1.ctm;
-  ./format_ali_single.pl ${ali}/ali.1.ctm ${rec_number} result_ali_${id}.1
+  ./format_ali_single.pl ${ali}/ali.1.ctm ${rec_number} $x/result_ali.${rec_number}
 else
   popd
   exit 1;
