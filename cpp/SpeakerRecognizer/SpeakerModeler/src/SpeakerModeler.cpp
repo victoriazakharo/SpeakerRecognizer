@@ -29,7 +29,7 @@ void SpeakerModeler::BuildDictorModels(const map<int, map<int, vector<vector<dou
 	WriteModel(modelFolder, modelPath, models);
 }
 
-void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignment_path, 
+void SpeakerModeler::ExtractBatchFeatures(const string& folder, const string& alignment_path, 
 	map<int, map<int, vector<vector<double>>>>& features, map<int, string>& files) {
 	string line;
 	int phoneme, record, dictor, prev_record = -1;
@@ -43,7 +43,7 @@ void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignme
 			SSCANF(&line[0], "%d %d %lf %lf %d", &dictor, &record, &start, &end, &phoneme);
 			if (prev_record != record) {
 				if (!sound.Initialize(folder + files[record])) {
-					printf("Cannot parse file %s\n", (folder + files[record]).c_str());
+					fprintf(stderr, "Cannot parse file %s\n", (folder + files[record]).c_str());
 					return;
 				}
 				sampling_rate = sound.getSamplingRate();
@@ -65,9 +65,7 @@ void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignme
 					input.push_back(data[i + j] * windowFunc(j, window_size_in_samples));
 				}
 				vector<double> segment_result;
-				for (const auto& extractor : extractors) {
-					extractor->Extract(segment_result, input);
-				}
+				mfccExtractor.Extract(segment_result, input);
 				features[dictor][phoneme].push_back(segment_result);
 			}
 		}
@@ -75,6 +73,51 @@ void SpeakerModeler::ExtractFeatures(const string& folder, const string& alignme
 	}
 	else {
 		fprintf(stderr, "Cannot open file %s\n", alignment_path.c_str());
+	}
+}
+
+void SpeakerModeler::ExtractFeatures(const string& folder, const string& align_file_prefix,
+	int record_num, map<int, vector<vector<double>>>& features, map<int, string>& files) {
+	string line;
+	int phoneme, window_size_in_samples, hop_in_samples, sampling_rate, offset;
+	double start, end;
+	SoundFile sound;
+	vector<double>& data = sound.getData();
+	for(int record = 0; record < record_num; record++) {
+		string name = folder + align_file_prefix + std::to_string(record);
+		std::ifstream f(name);
+		if (f.is_open()) {
+			while (getline(f, line)) {
+				SSCANF(&line[0], "%lf %lf %d", &start, &end, &phoneme);
+				if (!sound.Initialize(folder + files[record])) {
+					fprintf(stderr, "Cannot parse file %s\n", (folder + files[record]).c_str());
+					return;
+				}
+				sampling_rate = sound.getSamplingRate();
+				window_size_in_samples = windowSize * sampling_rate;
+				offset = window_size_in_samples / 4;
+				hop_in_samples = hop * sampling_rate;
+				data = sound.getData();
+				int start_in_samples = start * sampling_rate - offset;
+				start_in_samples = std::max(start_in_samples, 0);
+				int end_in_samples = end * sampling_rate + offset;
+				end_in_samples = std::min(end_in_samples, static_cast<int>(data.size())) - window_size_in_samples;
+				for (int i = start_in_samples; i < end_in_samples; i += hop_in_samples) {
+					vector<double> input;
+					input.reserve(window_size_in_samples);
+					for (int j = 0; j < window_size_in_samples; ++j) {
+						input.push_back(data[i + j] * windowFunc(j, window_size_in_samples));
+					}
+					vector<double> segment_result;
+					mfccExtractor.Extract(segment_result, input);
+					features[phoneme].push_back(segment_result);
+				}
+			}
+			f.close();
+		}
+		else {
+			fprintf(stderr, "Cannot open file %s\n", name.c_str());
+		}
 	}
 }
 
@@ -112,9 +155,6 @@ SpeakerModeler::SpeakerModeler(const string& model_folder,
 	windowSize(0.025), hop(0.01), gaussians(3), windowFunc(HammingWindow),
 	featureSize(13), modelPath(model_folder + model_file), modelFolder(model_folder) {
 
-	auto ptr = std::make_shared<MfccExtractor>();
-
-	//TODO: ensure fixed sample rate 
-	ptr->Init(windowSize, 16000, use_imfcc);	
-	extractors.push_back(ptr);
+	//TODO: ensure fixed sample rate
+	mfccExtractor.Init(windowSize, 16000, use_imfcc);
 }

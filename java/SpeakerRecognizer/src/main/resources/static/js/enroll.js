@@ -17,11 +17,29 @@ function bindEnrollButtons(recordBtn, stopBtn, actionBtn){
     });
 }
 
+function userEnrolled(source){
+    return enrolledRecords[source].length == enrollRecordNumbers[source];
+}
+
+function updateEnrollState(source) {
+    let enrolled = userEnrolled(source);
+    enrollBtn.prop('disabled', !enrolled);
+    if (enrolled) {
+        outputText.html(messageJson[lang]["enrolled"]);
+        outputText.attr('data-translate', "enrolled");
+    } else {
+        outputText.html(messageJson[lang]["not-enrolled"]);
+        outputText.attr('data-translate', "not-enrolled");
+    }
+}
+
 function setTextToEnroll(source){
     let source_lang = source.split('_')[0];
     let text = $("#textToEnroll");
     text.empty();
     $.getJSON("texts/" + source_lang + ".json", function(messages) {
+        enrollRecordNumbers[source] = messages.length;
+        updateEnrollState(source);
         for(let i = 0; i < messages.length; i++){
             let row = $("<p>").addClass("row text-fragment");
             let recordButton = $("<button>").addClass("btn btn-danger record-button")
@@ -63,13 +81,11 @@ function setTextToEnroll(source){
                             okButton.show();
                             failButton.hide();
                             enrolledRecords[source].push(id);
-                            if(enrolledRecords[source].length == messages.length){
-                                enrollBtn.prop('disabled', false);
-                            }
                         } else {
                             okButton.hide();
                             failButton.show();
                         }
+                        updateEnrollState(source);
                         waiter.stop();
                     });
                 });
@@ -92,6 +108,10 @@ $(function() {
     enrollBtn.click(function (e) {
         e.preventDefault();
         waiter.start();
-        waiter.stop();
+        let source = enrollSource.find(":selected").val();
+        $.get("add", { "source": source }, function () {
+            outputText.html(messageJson[lang]["enrolled"]);
+            waiter.stop();
+        });
     });
 });

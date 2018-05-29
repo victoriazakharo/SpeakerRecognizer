@@ -33,3 +33,4 @@ var waiter = {
 var lang = "en";
 var messageJson = {};
 var enrolledRecords = {};
+var enrollRecordNumbers = {}

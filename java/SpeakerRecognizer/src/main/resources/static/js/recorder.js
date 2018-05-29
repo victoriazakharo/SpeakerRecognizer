@@ -207,7 +207,6 @@
                             i++;
                         }			                
                         while(lastNonZero > i && samples[lastNonZero] == 0){
-
                             lastNonZero--;
                         }			
                         for (; i <= lastNonZero; i++, offset += 4) {

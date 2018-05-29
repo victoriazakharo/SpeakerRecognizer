@@ -9,7 +9,7 @@ RUN gradle build
 
 FROM ubuntu:16.04
 
-RUN apt-get update && apt-get install -y openjdk-8-jre sox automake libatlas3-base
+RUN apt-get update && apt-get install -y openjdk-8-jre sox libsox-fmt-mp3 automake libatlas3-base
 RUN apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --from=javabuilder /SpeakerRecognizer/build/libs/speaker-recognizer-0.1.war /speaker-recognizer-0.1.war

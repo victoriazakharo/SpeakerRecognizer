@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -lt 4 ]; then  
+if [ $# -lt 4 ]; then
   echo "Usage: process.sh <kaldi-trunk> <source-folder> <user-id> <record-id>"
   exit 1
 fi
@@ -26,23 +26,22 @@ export LC_ALL=C
 
 pushd ${source}
 
-ln -s ${utils}/ .
+ln -sf ${utils}/ .
+
+if [[ ${source} == *en_Timit ]]; then
+  base=${source/en_Timit/en_LibriSpeech}  
+  ln -sf ${base}/exp/tri4a exp/tri4a
+  ln -sf ${base}/data/lang data/lang
+fi
 
 x=data/${id}
 ali=exp/${id}
 
-${steps}/make_mfcc.sh --cmd "$train_cmd" --nj 1 $x exp/make_mfcc/$x mfcc/${id}
-${steps}/compute_cmvn_stats.sh $x exp/make_mfcc/$x mfcc/${id}
-
-${steps}/align_fmllr.sh --nj 1 --cmd "$train_cmd" $x data/lang exp/tri4a ${ali}
-if [ $? -eq 0 ]
-then
-  ${src}/bin/ali-to-phones --ctm-output exp/tri4a/final.mdl ark:"gunzip -c ${ali}/ali.1.gz|" -> ${ali}/ali.1.ctm;
-  ./format_ali_single.pl ${ali}/ali.1.ctm ${rec_number} $x/result_ali.${rec_number}
-else
-  popd
-  exit 1;
-fi
+${steps}/make_mfcc.sh --cmd "$train_cmd" --nj 1 $x exp/make_mfcc/$x mfcc/${id} && \
+${steps}/compute_cmvn_stats.sh $x exp/make_mfcc/$x mfcc/${id} && \
+${steps}/align_fmllr.sh --nj 1 --cmd "$train_cmd" $x data/lang exp/tri4a ${ali} && \
+${src}/bin/ali-to-phones --ctm-output exp/tri4a/final.mdl ark:"gunzip -c ${ali}/ali.1.gz|" -> ${ali}/ali.1.ctm && \
+./format_ali_single.pl ${ali}/ali.1.ctm $x/ali.${rec_number} || { popd; exit 1; }
 
 popd
 exit 0;

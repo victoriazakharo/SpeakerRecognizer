@@ -33,6 +33,18 @@ void SpeakerRecognizer::ExtractFeatures(const string& path,
 	}
 }
 
+int best_speaker(map<int, int>&result) {
+	int max = 0;
+	int best = 0;
+	for (auto& kv : result) {
+		if (kv.second > max) {
+			max = kv.second;
+			best = kv.first;
+		}
+	}
+	return best;
+}
+
 int SpeakerRecognizer::TellSpeaker(const vector<vector<double>>& tests) const {	
 	int best;
 	map<int, int> result;
@@ -53,24 +65,58 @@ int SpeakerRecognizer::TellSpeaker(const vector<vector<double>>& tests) const {
 		}
 		result[best]++;
 	}
-	int max = 0;
-	for (auto& kv : result) {
-		if (kv.second > max) {
-			max = kv.second;
-			best = kv.first;
-		}
+	return best_speaker(result);
+}
+
+int SpeakerRecognizer::TellSpeaker(const vector<vector<double>>& tests, int dictor, vector<gmm_diag>& dictor_phonemes) const {
+	int best;
+	map<int, int> result;
+	for (auto& kv : dictors) {
+		result[kv.first] = 0;
 	}
-	return best;
+	for (int i = 0; i < tests.size(); i++) {
+		double cur, max = -DBL_MAX;
+		mat F(tests[i]);
+		for (auto& kv : dictors) {
+			for (auto& model : kv.second) {
+				cur = model.avg_log_p(F);
+				if (cur > max) {
+					max = cur;
+					best = kv.first;
+				}
+			}
+		}
+		for (auto& model : dictor_phonemes) {
+			cur = model.avg_log_p(F);
+			if (cur > max) {
+				max = cur;
+				best = dictor;
+			}
+		} 
+		result[best]++;
+	}
+	return best_speaker(result);
 }
 
 int SpeakerRecognizer::Test(const string& test_file_name) {
-	vector<vector<double>> features;		
+	vector<vector<double>> features;
 	ExtractFeatures(test_file_name, features);
 	return TellSpeaker(features);
 }
 
+int SpeakerRecognizer::Test(const string& test_file_name, const string& dictor_folder) {
+	map<int, std::vector<gmm_diag>> dictor_map(ReadModel(dictor_folder, dictor_folder + modelFile));
+	vector<vector<double>> features;
+	ExtractFeatures(test_file_name, features);
+	if(dictor_map.empty()) {
+		return TellSpeaker(features);
+	}
+	auto dictor_pair = dictor_map.begin();
+	return TellSpeaker(features, dictor_pair->first, dictor_pair->second);
+}
 
-vector<int> SpeakerRecognizer::Test(const string& test_file_names, const string& folder) {
+
+vector<int> SpeakerRecognizer::TestBatch(const string& test_file_names, const string& folder) {
 	vector<int> answers;
 	int dictor;
 	string line, record;
@@ -106,9 +152,9 @@ SpeakerRecognizer::SpeakerRecognizer(const string& model_folder,
 	windowSize(0.025),
 	hop(0.010),
 	windowFunc(HammingWindow),
-	modelPath(model_folder + model_file),
+	modelFile(model_file),
 	modelFolder(model_folder),
-	dictors(ReadModel(modelFolder, modelPath)) {
+	dictors(ReadModel(modelFolder, model_folder +  model_file)) {
 	//TODO: ensure fixed sample rate
 	mfccExtractor.Init(windowSize, 16000, use_imfcc);
 }

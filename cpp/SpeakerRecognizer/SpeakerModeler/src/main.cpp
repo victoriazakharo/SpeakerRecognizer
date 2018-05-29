@@ -20,7 +20,7 @@ void model_batch(int argc, char* argv[]) {
 	if (argc == 6) {
 		map<int, string> file_locations;
 		ReadRecordPaths(file_locations, record_location_file);
-		processor.ExtractFeatures(record_folder, alignment_file, features, file_locations);
+		processor.ExtractBatchFeatures(record_folder, alignment_file, features, file_locations);
 	}
 	else {
 		string kaldi_feature_file(argv[6]);
@@ -34,21 +34,24 @@ void model_online(int argc, char* argv[]) {
 	if (argc != 3) {
 		printf("Usage: %s <user-folder> <number-of-records>\n", argv[0]);
 		return;
-	} 
+	}
 	string user_folder(argv[1]);
 	int number_of_records = atoi(argv[2]);
 	string model_folder = user_folder + "models/";
 	const string model_file = "model.txt";
-	string alignment_file = user_folder + "result_ali.txt";
-	
 
-	map<int, map<int, vector<vector<double>>>> features;
 	SpeakerModeler processor(model_folder, model_file);
 	map<int, string> file_locations;
 	for(int i = 0; i < number_of_records; i++) {
 		file_locations[i] = to_string(i) + "-16k.wav";
 	}
-	processor.ExtractFeatures(user_folder, alignment_file, features, file_locations);
+	map<int, vector<vector<double>>> dictor_features;
+	// TODO: config
+	const int dictor_number = 30;
+	processor.ExtractFeatures(user_folder, "ali.", number_of_records, dictor_features, file_locations);
+	const map<int, map<int, vector<vector<double>>>> features{ { dictor_number, dictor_features } };
+	string cmd = "exec rm -rf " + model_folder + "*";
+	system(cmd.c_str());
 	processor.BuildDictorModels(features);
 }
 

@@ -27,7 +27,7 @@ void recognize_batch(int argc, char* argv[]) {
 
 	vector<int> answers;
 	if (argc == 7) {
-		answers = recognizer.Test(expected_result_file, record_folder);
+		answers = recognizer.TestBatch(expected_result_file, record_folder);
 	}
 	else {
 		const string kaldi_feature_file(argv[7]);
@@ -70,16 +70,17 @@ void recognize_online(int argc, char* argv[]) {
 				string file = message.substr(space_ix + 1);
 				space_ix = file.find(' ');
 				string answer;
-				if (space_ix == string::npos) {
-					auto it = recognizers.find(source);
+				// TODO: make smth for checking if ask to recoginze (if ".wav")
+				if (file.back() == 'v') {
+					const string dictor_folder = file.substr(0, space_ix) + "models/";
+					file = file.substr(space_ix + 1);
 					// TODO: handle not found case
-					const int dictor = it != recognizers.end() ? it->second.Test(file) : -1;
-					answer = to_string(dictor) + "\n"; 
-				} else {
-					string module_name(argv[0]);
-					string modeler_name = "SpeakerRecognizer";
-					int ix = module_name.rfind(modeler_name);
-					string cmd = module_name.replace(ix, modeler_name.size(), "SpeakerModeler") + " " + file;
+					auto it = recognizers.find(source);
+					const int dictor = it != recognizers.end() ? it->second.Test(file, dictor_folder) : -1;
+					answer = to_string(dictor) + "\n";
+				}
+				else {
+					string cmd = "./SpeakerModeler " + file;
 					system(cmd.c_str());
 					answer = "ok\n";
 				}

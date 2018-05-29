@@ -1,9 +1,8 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include <map>
-#include "FeatureExtractor.h"
+#include "MfccExtractor.h"
 
 using std::vector;
 using std::map;
@@ -17,13 +16,15 @@ class SpeakerModeler {
 	int featureSize;
 	const string modelPath;
 	const string modelFolder;
-	vector<std::shared_ptr<FeatureExtractor>> extractors;
+	MfccExtractor mfccExtractor;
 public:
 	SpeakerModeler(const string& model_folder, const string& model_file,
 		bool use_imfcc = true);
 	void BuildDictorModels(const map<int, map<int, vector<vector<double>>>>& features) const;	
-	void ExtractFeatures(const string& folder, const string& alignment_path,
+	void ExtractBatchFeatures(const string& folder, const string& alignment_path,
 		map<int, map<int, vector<vector<double>>>>& features, map<int, string>& files);
+	void ExtractFeatures(const string& folder, const string& align_file_prefix, int record_num,
+		map<int, vector<vector<double>>>& features, map<int, string>& files);
 	void ReadFeatures(const string& alignment_path, map<int, map<int, vector<vector<double>>>>& features,
 	                  const string& feature_path, const string& record_map_path);
 };

@@ -16,6 +16,7 @@ RUN apt-get -y install liblapack3 libblas3 libarmadillo6 libsndfile1 libfftw3-3 
 RUN apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --from=cppbuilder /cpp/bin/SpeakerRecognizer /SpeakerRecognizer
+COPY --from=cppbuilder /cpp/bin/SpeakerModeler /SpeakerModeler
 WORKDIR /
 
 ENTRYPOINT ["./SpeakerRecognizer"]

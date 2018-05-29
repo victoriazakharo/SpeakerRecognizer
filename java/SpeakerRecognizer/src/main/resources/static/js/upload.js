@@ -35,6 +35,10 @@ $(function() {
                 contentType: false,
                 cache: false,
             }).done(function(data) {
+                if(data == "you"){
+                    data = messageJson[lang][data];
+                    outputText.attr('data-translate', "you");
+                }
                 outputText.html(data);
                 waiter.stop();
             });

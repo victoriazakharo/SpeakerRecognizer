@@ -43,14 +43,22 @@ function setRecognizedSpeakerPanel(){
 }
 
 function initTabs(){
-    $("#tabExample").click(setRecognizedSpeakerPanel);
-    $("#tabRecord").click(setRecognizedSpeakerPanel);
+    $("#tabExample").click(function() {
+        setRecognizedSpeakerPanel();
+        exampleSource.trigger("change");
+    });
+    $("#tabRecord").click(function() {
+        setRecognizedSpeakerPanel();
+        recordSource.trigger("change");
+    });
     $("#tabUpload").click(setRecognizedSpeakerPanel);
+    $("#tabSpeakers").click(function() {
+        speakersSource.trigger("change");
+    });
     $("#tabEnroll").click(function(){
         outputPanel.text(messageJson[lang]["status"]);
         outputPanel.attr('data-translate', "status");
-        outputText.html(messageJson[lang]["not-enrolled"]);
-        outputText.attr('data-translate', "not-enrolled");
+        enrollSource.trigger("change");
     });
 }
 
@@ -76,7 +84,6 @@ $(function() {
                     sources[j].append($(html).val(data[i]).text(data[i]));
                 }
                 sources[j].selectpicker("refresh");
-                sources[j].trigger("change");
             }
         });
     $('#testFiles').change(function(e) {

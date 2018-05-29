@@ -1,5 +1,6 @@
 package speakerid.util;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -51,12 +52,13 @@ public class Cleanup {
                 if(base.exists()){
                     File[] dirs = base.listFiles(File::isDirectory);
                     for(File directory : dirs) {
-                        if(directory.getName() != "lang"){
+                        String name = directory.getName();
+                        if(!name.equals("lang") && !name.equals("tri4a")){
                             BasicFileAttributes attr = Files.readAttributes(directory.toPath(), BasicFileAttributes.class);
                             long created = attr.creationTime().to(TimeUnit.SECONDS);
                             long now = new Date().getTime() / 1000;
                             if(now - created > SessionTimeoutSeconds){
-                                directory.delete();
+                                FileUtils.deleteDirectory(directory);
                             }
                         }
                     }

@@ -27,8 +27,10 @@ function stopRecord() {
     if(localStream){
         localStream.getTracks()[0].stop();
     }
-    context.disabled = true;
-    context.close();
+    if(context) {
+        context.disabled = true;
+        context.close();
+    }
 }
 
 function setTextToRecognize(source){
@@ -82,6 +84,10 @@ $(function() {
                 contentType: false,
                 cache: false,
             }).done(function(data) {
+                if(data == "you"){
+                    data = messageJson[lang][data];
+                    outputText.attr('data-translate', "you");
+                }
                 outputText.html(data);
                 waiter.stop();
             });

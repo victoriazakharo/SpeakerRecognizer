@@ -5,9 +5,12 @@ std::map<int, std::vector<arma::gmm_diag>> ReadModel(const std::string& folder,
 
 	std::map<int, std::vector<arma::gmm_diag>> result;
 	try {
+		std::ifstream in(file_name, std::ios::binary);
+		if(in.fail()) {
+			return result;
+		}
 		std::vector<int> model_sizes;
 		std::vector<int> dictors;
-		std::ifstream in(file_name, std::ios::binary);
 		printf("Reading models from %s\n", folder.c_str());
 		int tmp;
 		int dictors_num;
