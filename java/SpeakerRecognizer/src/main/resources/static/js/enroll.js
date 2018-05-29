@@ -52,7 +52,7 @@ function setTextToEnroll(source){
                 .append($("<span>").addClass("glyphicon glyphicon-remove"));
             let recordId = i + "";
             failButton.hide();
-            if(enrolledRecords[source].indexOf(recordId) < 0){
+            if(!enrolledRecords[source].has(recordId)){
                 okButton.hide();
             }
             let processButton = $("<button>")
@@ -80,7 +80,7 @@ function setTextToEnroll(source){
                         if(data == "accepted"){
                             okButton.show();
                             failButton.hide();
-                            enrolledRecords[source].push(id);
+                            enrolledRecords[source].add(id);
                         } else {
                             okButton.hide();
                             failButton.show();
@@ -102,7 +102,9 @@ function setTextToEnroll(source){
 
 $(function() {
     $.get("getUserInfo", function (data) {
-        enrolledRecords = data;
+        Object.keys(data).forEach(function(key) {
+            enrolledRecords[key] = new Set(data[key]);
+        });
     });
     enrollBtn.prop('disabled', true);
     enrollBtn.click(function (e) {
