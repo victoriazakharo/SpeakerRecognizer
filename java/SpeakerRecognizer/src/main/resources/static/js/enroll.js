@@ -32,7 +32,7 @@ function getExampleAudio(source, recordId){
 }
 
 function getUserAudio(){
-    let userSource =  $("<source src='' type='audio/wav' data-translate='audio-unsupported'>")
+    let userSource = $("<source src='' type='audio/wav' data-translate='audio-unsupported'>")
     return $("<audio controls=''>").append(userSource);
 }
 
@@ -77,7 +77,7 @@ function setTextToEnroll(source){
     });
 }
 
-function process(okButton, failButton, processButton, source, data) {
+function process(okButton, failButton, processButton, source, data, id){
     outputText.html(messageJson[lang]["not-enrolled"]);
     processButton.prop('disabled', true);
     if (data == "accepted") {
@@ -102,7 +102,7 @@ function onProcess(okButton, failButton, processButton){
             $("#tabs-alert").delay(200).addClass("in").fadeOut(2000);
             $("#alert-text").html(messageJson[lang]["record-too-long"]);
             outputText.html(messageJson[lang]["not-enrolled"]);
-            process(okButton, failButton, processButton, source, "failed");
+            process(okButton, failButton, processButton, source, "failed", id);
             return;
         }
         let fd = new FormData();
@@ -116,7 +116,7 @@ function onProcess(okButton, failButton, processButton){
             contentType: false,
             cache: false,
         }).done(function (data) {
-            process(okButton, failButton, processButton, source, data);
+            process(okButton, failButton, processButton, source, data, id);
         });
     });
 }
