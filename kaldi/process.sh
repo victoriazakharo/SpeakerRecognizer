@@ -28,12 +28,6 @@ pushd ${source}
 
 ln -sf ${utils}/ .
 
-if [[ ${source} == *en_Timit ]]; then
-  base=${source/en_Timit/en_LibriSpeech}  
-  ln -sf ${base}/exp/tri4a exp/tri4a
-  ln -sf ${base}/data/lang data/lang
-fi
-
 x=data/${id}
 ali=exp/${id}
 

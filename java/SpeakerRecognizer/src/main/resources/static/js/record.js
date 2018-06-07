@@ -40,25 +40,32 @@ function setTextToRecognize(source){
     $("#textToRecognize").text(text);
 }
 
-function bindRecordButtons(recordBtn, stopBtn, source, audio, actionBtn){
+function bindRecordButtons(recordBtn, stopBtn, audio, actionBtn, triggerNeighbors){
     actionBtn.prop('disabled', true);
     stopBtn.hide();
     recordBtn.click(function() {
         startRecord();
         actionBtn.prop('disabled', true);
+        if(triggerNeighbors){
+            $(".record-button, .process-button").prop('disabled', true);
+        }
         recordBtn.hide();
         stopBtn.show();
     });
+    let audioElement = audio[0];
     stopBtn.click(function() {
         actionBtn.prop('disabled', false);
+        if(triggerNeighbors) {
+            $(".record-button").prop('disabled', false);
+        }
         recordBtn.show();
         stopBtn.hide();
         if(recorder){
             recorder.exportWAV(function(blob) {
                 var url = URL.createObjectURL(blob);
-                source.attr("src", url);
-                audio[0].pause();
-                audio[0].load();
+                audioElement.children[0].setAttribute("src", url);
+                audioElement.pause();
+                audioElement.load();
             });
         }
         stopRecord();
@@ -66,8 +73,8 @@ function bindRecordButtons(recordBtn, stopBtn, source, audio, actionBtn){
 }
 
 $(function() {
-    bindRecordButtons($("#recordTabRecord"), $("#recordTabStop"),
-        $("#recordAudioSource"), $("#recordAudio"), recognizeRecordedBtn);
+    bindRecordButtons($("#recordTabRecord"), $("#recordTabStop"), $("#recordAudio"),
+        recognizeRecordedBtn, false);
     recognizeRecordedBtn.click(function(e) {
         e.preventDefault();
         waiter.start();

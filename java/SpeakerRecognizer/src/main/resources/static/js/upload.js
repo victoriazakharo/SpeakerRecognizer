@@ -9,7 +9,7 @@ $(function() {
         $(':file').on('fileselect', function(event, label) {
             var input = $(this).parents('.input-group').find(':text');
             if(this.files[0].size > 3000000){
-                input.val("Please select a file under 3Mb");
+                input.val(messageJson[lang]["file-too-large"]);
                 event.preventDefault();
                 uploadBtn.prop('disabled', true);
                 return;

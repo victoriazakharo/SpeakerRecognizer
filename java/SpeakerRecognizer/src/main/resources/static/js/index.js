@@ -84,6 +84,9 @@ $(function() {
                     sources[j].append($(html).val(data[i]).text(data[i]));
                 }
                 sources[j].selectpicker("refresh");
+                if(sources[j] == exampleSource){
+                    sources[j].trigger("change");
+                }
             }
         });
     $('#testFiles').change(function(e) {

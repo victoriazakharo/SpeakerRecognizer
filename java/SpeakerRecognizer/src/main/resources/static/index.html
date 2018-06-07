@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
     <head>
         <title>Speaker Recognizer</title>
@@ -75,18 +75,25 @@
                         </li>
                     </ul>
                     <div class="tab-content">
+                        <div class="alert alert-danger fade" id="tabs-alert">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <span id="alert-text"></span>
+                        </div>
                         <div id="exampleTab" class="tab-pane fade  in active">
                             <div class="panel-body">
                                 <p>
                                     <select class="form-control" name="testFiles" id="testFiles"></select>
                                 </p>
-                                <p> <audio id="exampleAudio" controls="">
-                                    <source id="exampleAudioSource" type="audio/wav" data-translate="audio-unsupported"/>
-                                </audio></p>
+                                <p>
+                                    <audio id="exampleAudio" controls="">
+                                        <source id="exampleAudioSource" type="audio/wav" data-translate="audio-unsupported"/>
+                                    </audio>
+                                </p>
                                 <p>
                                     <select class="selectpicker" id="exampleSource"></select>
                                     <button id="testBtn" class="btn btn-primary" data-translate="recognize">
-                                    </button></p>
+                                    </button>
+                                </p>
                             </div>
                         </div>
                         <div id="speakersTab" class="tab-pane fade">
@@ -108,8 +115,8 @@
                             <div class="panel-body">
                                 <div >
                                     <p>
-                                    <p data-translate="read-text"></p>
-                                    <p><i id="textToRecognize"></i></p>
+                                        <p data-translate="read-text"></p>
+                                        <p><i id="textToRecognize"></i></p>
                                         <button id="recordTabRecord" class="btn btn-danger"
                                                 data-translate="record">
                                         </button>
@@ -117,9 +124,10 @@
                                                 data-translate="stop">
                                         </button>
                                     </p>
-                                    <p><audio id="recordAudio" controls="">
-                                        <source id="recordAudioSource" src="" type="audio/wav"
-                                                data-translate="audio-unsupported"></audio>
+                                    <p>
+                                        <audio id="recordAudio" controls="">
+                                            <source src="" type="audio/wav"
+                                                    data-translate="audio-unsupported"></audio>
                                     </p>
                                     <p>
                                         <select class="selectpicker" id="recordSource"
@@ -133,14 +141,14 @@
                         </div>
                         <div id="uploadtab" class="tab-pane fade">
                             <div class="panel-body">
-                                <form id="uploadForm" enctype="multipart/form-data" method="POST" >
+                                <form id="uploadForm" enctype="multipart/form-data" method="POST">
                                     <div class="input-group">
                                         <label class="input-group-btn">
                                             <span class="btn btn-primary">
                                                 <span data-translate="browse"></span>
                                                 <input type="file" name="data"
-                                                    accept="audio/wav,audio/mp3,audio/aiff,audio/flac,audio/ogg"
-                                                    style="display: none;">
+                                                       accept="audio/wav,audio/mp3,audio/aiff,audio/flac,audio/ogg"
+                                                       style="display: none;">
                                             </span>
                                         </label>
                                         <input type="text" class="form-control" readonly>
@@ -157,7 +165,7 @@
                         </div>
                         <div id="enrollTab" class="tab-pane fade">
                             <div class="panel-body">
-                                <div >
+                                <div>
                                     <p>
                                         <p data-translate="read-text"></p>
                                         <p><div id="textToEnroll"></div></p>

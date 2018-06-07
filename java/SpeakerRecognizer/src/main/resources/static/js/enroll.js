@@ -1,22 +1,3 @@
-function bindEnrollButtons(recordBtn, stopBtn, actionBtn){
-    actionBtn.prop('disabled', true);
-    stopBtn.hide();
-    recordBtn.click(function() {
-        startRecord();
-        $(".record-button").prop('disabled', true);
-        $(".process-button").prop('disabled', true);
-        recordBtn.hide();
-        stopBtn.show();
-    });
-    stopBtn.click(function() {
-        actionBtn.prop('disabled', false);
-        $(".record-button").prop('disabled', false);
-        recordBtn.show();
-        stopBtn.hide();
-        stopRecord();
-    });
-}
-
 function userEnrolled(source){
     return enrolledRecords[source].length == enrollRecordNumbers[source];
 }
@@ -31,6 +12,28 @@ function updateEnrollState(source) {
         outputText.html(messageJson[lang]["not-enrolled"]);
         outputText.attr('data-translate', "not-enrolled");
     }
+}
+
+function buildEnrollTable(exampleAudio, userAudio){
+    let exampleRow = $("<tr>")
+        .append($("<th scope='row' data-translate='example'>").text(messageJson[lang]["example"]))
+        .append($("<td>").append(exampleAudio));
+    let userRow = $("<tr>")
+        .append($("<th scope='row' data-translate='you'>").text(messageJson[lang]["you"]))
+        .append($("<td>").append(userAudio));
+    let tableBody = $("<tbody>").append(exampleRow).append(userRow);
+    return $("<table>").addClass("table").append(tableBody);
+}
+
+function getExampleAudio(source, recordId){
+    let exampleSource = $("<source type='audio/wav' data-translate='audio-unsupported'>")
+        .attr("src", source + "/audio/enroll/" + recordId + ".wav");
+    return $("<audio controls=''>").append(exampleSource);
+}
+
+function getUserAudio(){
+    let userSource =  $("<source src='' type='audio/wav' data-translate='audio-unsupported'>")
+    return $("<audio controls=''>").append(userSource);
 }
 
 function setTextToEnroll(source){
@@ -58,45 +61,63 @@ function setTextToEnroll(source){
             let processButton = $("<button>")
                 .addClass("btn btn-warning process-button").attr("id", recordId)
                 .attr("data-translate", "process").text(messageJson[lang]["process"]);
-            processButton.click(function (e) {
-                e.preventDefault();
-                waiter.start();
-                let source = enrollSource.find(":selected").val();
-                let id = $(this).attr('id');
-                recorder && recorder.exportWAV(function (blob) {
-                    let fd = new FormData();
-                    fd.set("data", blob, id + ".wav");
-                    fd.set("source", source);
-                    $.post({
-                        url: 'process',
-                        data: fd,
-                        enctype: 'multipart/form-data',
-                        processData: false,
-                        contentType: false,
-                        cache: false,
-                    }).done(function (data) {
-                        outputText.html(messageJson[lang]["not-enrolled"]);
-                        processButton.prop('disabled', true);
-                        if(data == "accepted"){
-                            okButton.show();
-                            failButton.hide();
-                            enrolledRecords[source].add(id);
-                        } else {
-                            okButton.hide();
-                            failButton.show();
-                        }
-                        updateEnrollState(source);
-                        waiter.stop();
-                    });
-                });
+            processButton.click(function(){
+                onProcess(okButton, failButton, processButton);
             });
             let name = $("<i>").append(messages[i]).addClass("col-xs-8");
+            let exampleAudio = getExampleAudio(source, recordId);
+            let userAudio = getUserAudio();
+            let table = buildEnrollTable(exampleAudio, userAudio);
             let record = $("<div>").append(recordButton).append(stopButton).
-                append(processButton).append(okButton).append(failButton).addClass("col-xs-4");
-            bindEnrollButtons(recordButton, stopButton, processButton);
+                append(processButton).append(okButton).append(failButton).append(table).addClass("col-xs-4");
+            bindRecordButtons(recordButton, stopButton, userAudio, processButton, true);
             row.append(name).append(record);
             text.append(row);
         }
+    });
+}
+
+function process(okButton, failButton, processButton, source, data) {
+    outputText.html(messageJson[lang]["not-enrolled"]);
+    processButton.prop('disabled', true);
+    if (data == "accepted") {
+        okButton.show();
+        failButton.hide();
+        enrolledRecords[source].add(id);
+    } else {
+        okButton.hide();
+        failButton.show();
+    }
+    updateEnrollState(source);
+    waiter.stop();
+}
+
+function onProcess(okButton, failButton, processButton){
+    waiter.start();
+    let source = enrollSource.find(":selected").val();
+    let id = processButton.attr('id');
+    recorder && recorder.exportWAV(function (blob) {
+        if (blob.size > 3000000) {
+            $("#tabs-alert").removeClass("in").show();
+            $("#tabs-alert").delay(200).addClass("in").fadeOut(2000);
+            $("#alert-text").html(messageJson[lang]["record-too-long"]);
+            outputText.html(messageJson[lang]["not-enrolled"]);
+            process(okButton, failButton, processButton, source, "failed");
+            return;
+        }
+        let fd = new FormData();
+        fd.set("data", blob, id + ".wav");
+        fd.set("source", source);
+        $.post({
+            url: 'process',
+            data: fd,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+        }).done(function (data) {
+            process(okButton, failButton, processButton, source, data);
+        });
     });
 }
 

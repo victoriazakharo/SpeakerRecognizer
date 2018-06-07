@@ -154,6 +154,7 @@ SpeakerRecognizer::SpeakerRecognizer(const string& model_folder,
 	windowFunc(HammingWindow),
 	modelFile(model_file),
 	modelFolder(model_folder),
+	useImfcc(use_imfcc),
 	dictors(ReadModel(modelFolder, model_folder +  model_file)) {
 	//TODO: ensure fixed sample rate
 	mfccExtractor.Init(windowSize, 16000, use_imfcc);

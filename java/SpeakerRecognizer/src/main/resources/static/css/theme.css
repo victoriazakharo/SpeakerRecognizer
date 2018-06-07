@@ -103,3 +103,10 @@ code {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+#tabs-alert {
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    z-index: 1000;
+}

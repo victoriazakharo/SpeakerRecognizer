@@ -66,8 +66,8 @@ public class HomeController {
             }
             input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             output = new DataOutputStream(clientSocket.getOutputStream());
-            new ProcessBuilder(kaldiDirectory + "/link_kaldi_tools.sh",
-                    kaldiDirectory).inheritIO().start().waitFor();
+            new ProcessBuilder(kaldiDirectory + "/make_soft_links.sh",
+                    kaldiDirectory, speakersDirectory).inheritIO().start().waitFor();
             cleanup.start();
         } catch (Exception e) {
             e.printStackTrace();

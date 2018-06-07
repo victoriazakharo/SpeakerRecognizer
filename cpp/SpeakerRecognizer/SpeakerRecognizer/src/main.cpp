@@ -22,8 +22,8 @@ void recognize_batch(int argc, char* argv[]) {
 	const string use_imfcc(argv[6]);
 
 	// TODO: config
-	bool mfcc = use_imfcc == "True" || use_imfcc == "true";
-	SpeakerRecognizer recognizer(model_folder, model_file, mfcc);
+	bool imfcc = use_imfcc == "True" || use_imfcc == "true";
+	SpeakerRecognizer recognizer(model_folder, model_file, imfcc);
 
 	vector<int> answers;
 	if (argc == 7) {
@@ -70,19 +70,23 @@ void recognize_online(int argc, char* argv[]) {
 				string file = message.substr(space_ix + 1);
 				space_ix = file.find(' ');
 				string answer;
-				// TODO: make smth for checking if ask to recoginze (if ".wav")
-				if (file.back() == 'v') {
-					const string dictor_folder = file.substr(0, space_ix) + "models/";
-					file = file.substr(space_ix + 1);
-					// TODO: handle not found case
-					auto it = recognizers.find(source);
-					const int dictor = it != recognizers.end() ? it->second.Test(file, dictor_folder) : -1;
-					answer = to_string(dictor) + "\n";
-				}
-				else {
-					string cmd = "./SpeakerModeler " + file;
-					system(cmd.c_str());
-					answer = "ok\n";
+				auto it = recognizers.find(source);
+				if(it != recognizers.end()) {
+					// TODO: make smth for checking if ask to recoginze (if ".wav")
+					if (file.back() == 'v') {
+						const string dictor_folder = file.substr(0, space_ix) + "models/";
+						file = file.substr(space_ix + 1);
+						// TODO: handle not found case
+						const int dictor = it->second.Test(file, dictor_folder);
+						answer = to_string(dictor) + "\n";
+					}
+					else {
+						string cmd = "./SpeakerModeler " + file + " " + to_string(it->second.useImfcc);
+						system(cmd.c_str());
+						answer = "ok\n";
+					}
+				} else {
+					answer = "failed\n";
 				}
 				message.clear();
 				if (send(socket, &answer[0], answer.size(), 0) < 0) {
