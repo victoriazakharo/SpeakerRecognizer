@@ -26,7 +26,7 @@ export LC_ALL=C
 
 pushd ${source}
 
-ln -sf ${utils}/ .
+ln -sf ${utils} .
 
 x=data/${id}
 ali=exp/${id}

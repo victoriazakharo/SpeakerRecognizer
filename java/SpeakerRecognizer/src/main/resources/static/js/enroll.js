@@ -1,5 +1,5 @@
 function userEnrolled(source){
-    return enrolledRecords[source].length == enrollRecordNumbers[source];
+    return enrolledRecords[source].size == enrollRecordNumbers[source];
 }
 
 function updateEnrollState(source) {
@@ -97,7 +97,7 @@ function onProcess(okButton, failButton, processButton){
     let source = enrollSource.find(":selected").val();
     let id = processButton.attr('id');
     recorder && recorder.exportWAV(function (blob) {
-        if (blob.size > 3000000) {
+        if (blob.size > 4000000) {
             $("#tabs-alert").removeClass("in").show();
             $("#tabs-alert").delay(200).addClass("in").fadeOut(2000);
             $("#alert-text").html(messageJson[lang]["record-too-long"]);
